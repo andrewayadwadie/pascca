@@ -130,6 +130,17 @@ a supervisor and leave a half-started process); validating lazily on first acces
 violates FR-006 directly); printing only the first failure (rejected — forces the developer
 through one restart per missing variable).
 
+**Gap found and fixed during implementation (2026-08-10)**: this section describes *validating*
+`process.env`, but not how `.env` gets *into* `process.env` in the first place — nothing did.
+`quickstart.md` instructed `cp .env.example .env`, but no code loaded that file; a developer
+following it exactly would have hit "DATABASE_URL: Required" regardless of what `.env` contained.
+Fixed with Node 22's native `--env-file-if-exists=../../.env` flag on `apps/api`'s `dev` and
+`start` scripts (confirmed `tsx` forwards it to the underlying Node process) — no `dotenv`
+dependency needed, and `-if-exists` means a missing `.env` falls through to loadEnv's own
+friendlier per-variable error instead of a blunt Node file-not-found crash. Verified end-to-end
+with `env -i` (a clean environment) and a real file, confirming values arrive purely from the
+file, not inherited shell state.
+
 ---
 
 ## R6 — Fail-fast infrastructure connectivity
