@@ -152,12 +152,12 @@ no migration executes.
 
 ### Implementation for User Story 3
 
-- [ ] T046 [US3] Create `.github/workflows/ci.yml` triggered on `pull_request`, with one `quality` job running lint, typecheck, test, and build as four named steps each guarded by `if: '!cancelled()'` so **all four report even when an earlier one fails** (FR-010, research R8). Pin Node via `node-version-file: .nvmrc`
-- [ ] T047 [US3] Add pnpm store and Turborepo cache restoration to `.github/workflows/ci.yml`
-- [ ] T048 [US3] Create `.github/workflows/migrate.yml` triggered **only** by `workflow_dispatch`, with its job bound to a protected GitHub Environment. This is the **only** file in the repository containing a migration step (FR-012, Article 32, research R9)
-- [ ] T049 [US3] Verify no migration step exists anywhere in `.github/workflows/ci.yml` and that no deploy workflow ships in this feature — the guarantee must be structural, not a comment asking people not to (spec edge case)
-- [ ] T050 [US3] Open a draft pull request against the scaffold and confirm all four checks run, report individually, and pass with zero manual setup by a reviewer (SC-003, US3 scenarios 1–2)
-- [ ] T051 [US3] **Human action — cannot be automated.** In GitHub **Settings → Environments**, create the environment referenced by `migrate.yml`, add at least one **required reviewer**, and scope the production database secret to it. Protection rules cannot be declared in YAML; **until this is done the approval gate is nominal and Article 32 is not satisfied** (research R9, quickstart.md)
+- [X] T046 [US3] Create `.github/workflows/ci.yml` triggered on `pull_request`, with one `quality` job running lint, typecheck, test, and build as four named steps each guarded by `if: '!cancelled()'` so **all four report even when an earlier one fails** (FR-010, research R8). Pin Node via `node-version-file: .nvmrc`
+- [X] T047 [US3] Add pnpm store and Turborepo cache restoration to `.github/workflows/ci.yml`
+- [X] T048 [US3] Create `.github/workflows/migrate.yml` triggered **only** by `workflow_dispatch`, with its job bound to a protected GitHub Environment. This is the **only** file in the repository containing a migration step (FR-012, Article 32, research R9)
+- [X] T049 [US3] Verified: `grep -in 'migrate\|migration' .github/workflows/ci.yml` matches only explanatory comments, no actual step. Two workflow files total (`ci.yml`, `migrate.yml`) — no `deploy.yml` exists. `migrate.yml`'s trigger is `workflow_dispatch` only, no `push`/`pull_request`
+- [X] T050 [US3] **Verified live on GitHub, 2026-08-10** — PR #1 opened (draft): https://github.com/andrewayadwadie/pascca/pull/1. First run failed for real (`next-env.d.ts` triple-slash-reference lint error — a genuine bug this task caught, fixed in `packages/config/eslint/base.js`, see commit fdc0c90). Second run: **all 4 checks passed in 54s**, zero manual setup (SC-003 confirmed for real, not just asserted)
+- [ ] T051 [US3] **NOT DONE — human action, cannot be automated by this agent.** In GitHub **Settings → Environments** for `andrewayadwadie/pascca`: create an environment named `production` (matching `migrate.yml`'s `environment:` key), add at least one **required reviewer**, and add a `DATABASE_URL` secret scoped to that environment (not repository-wide). Protection rules cannot be declared in YAML — I have `repo` scope via `gh` but deliberately did not attempt this, since silently configuring who is allowed to approve production migrations is not a decision an agent makes unattended. **Until this is done, dispatching `migrate.yml` would NOT wait for approval — the gate is currently nominal, and Article 32 is not fully satisfied.**
 
 **Checkpoint**: All three user stories independently functional.
 
@@ -165,11 +165,11 @@ no migration executes.
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T052 [P] Create a root `README.md` pointing at `specs/001-monorepo-scaffold/quickstart.md` for setup, and stating the Node 22 requirement up front
-- [ ] T053 Walk `quickstart.md` end to end on a genuinely clean clone and correct any step that does not work as written
-- [ ] T054 Run the definition-of-done gate: `pnpm lint && pnpm typecheck && pnpm test && pnpm build` green across all six workspace members (Article 31)
-- [ ] T055 Confirm every workspace member declares all five scripts and carries at least one **executing** test — a member with zero tests violates `contracts/workspace-tasks.md` (FR-011)
-- [ ] T056 Verify no secret, credential, or `.env` file is committed, and that `.gitignore` covers `.env` while permitting `.env.example` (Article 29 **[NN]**)
+- [X] T052 [P] Create a root `README.md` pointing at `specs/001-monorepo-scaffold/quickstart.md` for setup, and stating the Node 22 requirement up front
+- [X] T053 **Walked verbatim, 2026-08-10**: every command block in quickstart.md tested exactly as written (unset DATABASE_URL → fails naming it; PORT=not-a-number → fails naming it; `grep -c hunter2` → 0; docker compose stop/start postgres → fail-fast + recovery; chained `pnpm lint && typecheck && test && build` → exit 0). One real gap found and fixed: `.env` loading was never wired up — see commit f3eb0dc
+- [X] T054 **Verified 2026-08-10**: `pnpm lint && pnpm typecheck && pnpm test && pnpm build` — exit 0, all 6 workspace members, 66 tests passing (25+1+1+34+2+3)
+- [X] T055 **Verified programmatically**: all 6 members (`packages/{config,types,api-client}`, `apps/{api,web,admin}`) declare all 5 scripts; every member has ≥1 `.test.ts(x)` file
+- [X] T056 **Verified**: only `.env.example` is tracked; `.gitignore` covers `.env`/`.env.*` with `!.env.example`; `git check-ignore -v .env` confirms active; no credential patterns found in committed source
 - [ ] T057 Report the two flagged items to the client as **open decisions, not completed work**: (1) the Node 22 vs. local Node 24 divergence — switch runtime or obtain sign-off for an Article 5 amendment (Article 34 forbids resolving it in-flight); (2) confirmation that the GitHub Environment reviewer from T051 is actually configured
 
 ---
