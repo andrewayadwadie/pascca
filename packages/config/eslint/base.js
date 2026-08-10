@@ -27,6 +27,10 @@ export default [
     },
   },
   {
-    ignores: ["dist/**", ".next/**", ".turbo/**", "coverage/**", "node_modules/**"],
+    // next-env.d.ts is Next.js's own auto-generated ambient-types file, created by `next dev`/
+    // `next build` and committed by Next.js convention. It ALWAYS contains a triple-slash
+    // reference by design — that's not app code to lint, excluding it is correct, not a
+    // suppression of a real violation (caught by CI, research/tasks note this).
+    ignores: ["dist/**", ".next/**", ".turbo/**", "coverage/**", "node_modules/**", "next-env.d.ts"],
   },
 ];
