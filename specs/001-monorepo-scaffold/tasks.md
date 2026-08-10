@@ -170,7 +170,7 @@ no migration executes.
 - [X] T054 **Verified 2026-08-10**: `pnpm lint && pnpm typecheck && pnpm test && pnpm build` — exit 0, all 6 workspace members, 66 tests passing (25+1+1+34+2+3)
 - [X] T055 **Verified programmatically**: all 6 members (`packages/{config,types,api-client}`, `apps/{api,web,admin}`) declare all 5 scripts; every member has ≥1 `.test.ts(x)` file
 - [X] T056 **Verified**: only `.env.example` is tracked; `.gitignore` covers `.env`/`.env.*` with `!.env.example`; `git check-ignore -v .env` confirms active; no credential patterns found in committed source
-- [ ] T057 Report the two flagged items to the client as **open decisions, not completed work**: (1) the Node 22 vs. local Node 24 divergence — switch runtime or obtain sign-off for an Article 5 amendment (Article 34 forbids resolving it in-flight); (2) confirmation that the GitHub Environment reviewer from T051 is actually configured
+- [X] T057 Reported to the user directly in the `/speckit-implement` conversation summary as open decisions, not completed work: (1) Node 22 vs. local Node 24 divergence; (2) T051's GitHub Environment reviewer setup
 
 ---
 
