@@ -8,7 +8,10 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests**: **MANDATORY** for every risk area in Article 26 that this feature touches — availability,
+booking concurrency, permissions, auth token rotation, i18n/RTL, dashboard authorisation, load.
+Tests for those areas are not negotiable and a phase is not complete without them. Tests outside
+those areas are added where they earn their keep, not for coverage theatre.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -20,10 +23,15 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+Fixed by the constitution (Articles 5, 6, 14, 21). Use these, not the generic `src/`:
+
+- **API**: `apps/api/src/modules/<name>/` — exactly `<name>.routes.ts`, `.service.ts`,
+  `.repository.ts`, `.schema.ts` (Art 6). Tests in `apps/api/tests/`.
+- **Website**: `apps/web/app/[locale]/…`, strings in `apps/web/messages/{ar,en}.json`
+- **Dashboard**: `apps/admin/src/routes/…`, strings in `apps/admin/messages/{ar,en}.json`
+- **Shared**: `packages/types` (generated from OpenAPI — never hand-edited),
+  `packages/config/tokens.css`
+- **Schema**: `apps/api/prisma/schema.prisma` · **Error codes**: `docs/api.md`
 
 <!-- 
   ============================================================================
@@ -48,9 +56,9 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T001 Create the monorepo layout per plan.md (apps/api, apps/web, apps/admin, packages/*)
+- [ ] T002 Initialize pnpm workspace + TypeScript project references
+- [ ] T003 [P] Configure ESLint, Prettier, and the lint rules that enforce Articles 6, 14, and 17
 
 ---
 
@@ -62,12 +70,15 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 Prisma schema + migration framework, designed so Phase 9 ordering needs no table changes (Art 8)
+- [ ] T005 [P] Zod env schema in apps/api/src/config/env.ts — fail fast at boot; update .env.example (Art 13)
+- [ ] T006 [P] Response envelope + error-code registry wired to docs/api.md (Art 9)
+- [ ] T007 Seeded role→permission map + requirePermission preHandler (Art 10)
+- [ ] T008 [P] Security plugins: helmet, CORS allow-list, rate limits, argon2, refresh rotation with reuse detection (Art 25)
+- [ ] T009 AuditLog writer + soft-delete convention (Art 12)
+- [ ] T010 [P] packages/config/tokens.css + font binding on html[lang] (Art 17)
+- [ ] T011 [P] i18n scaffolding: ar default, RTL default, messages/{ar,en}.json, hreflang (Art 14)
+- [ ] T012 OpenAPI 3.1 emission + packages/types generation pipeline (Art 5)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -79,21 +90,25 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 1 (MANDATORY for Article 26 risk areas) ⚠️
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T010 [P] [US1] Contract test for [endpoint] in apps/api/tests/integration/[name].test.ts
+- [ ] T011 [P] [US1] Permission matrix test (every role × [endpoint], asserting status codes) in apps/api/tests/permissions/[name].test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T012 [US1] Add [Entity] to apps/api/prisma/schema.prisma + migration (Art 5, 8)
+- [ ] T013 [P] [US1] Zod DTOs in apps/api/src/modules/[name]/[name].schema.ts (Art 6)
+- [ ] T014 [P] [US1] Repository in apps/api/src/modules/[name]/[name].repository.ts — Prisma only, no business rules (Art 6)
+- [ ] T015 [US1] Service in apps/api/src/modules/[name]/[name].service.ts — no req/reply/status codes (Art 6)
+- [ ] T016 [US1] Routes in apps/api/src/modules/[name]/[name].routes.ts with swagger schema + requirePermission (Art 6, 10)
+- [ ] T017 [US1] Register error codes for this module in docs/api.md (Art 9)
+- [ ] T018 [US1] Wire AuditLog diff on every mutation; soft delete where applicable (Art 12)
+- [ ] T019 [US1] Regenerate packages/types from the OpenAPI spec (Art 5)
+- [ ] T020 [P] [US1] ar + en strings in messages/{ar,en}.json — no literals in components (Art 14)
+- [ ] T021 [US1] UI in apps/[web|admin] consuming the real endpoint, logical CSS properties only (Art 4, 14, 17)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -105,17 +120,17 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 2 (MANDATORY for Article 26 risk areas) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T022 [P] [US2] Contract test for [endpoint] in apps/api/tests/integration/[name].test.ts
+- [ ] T023 [P] [US2] i18n test: AR↔EN switch preserves state; RTL snapshot (Art 14, 26)
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T024 [US2] Schema + migration for [Entity] in apps/api/prisma/schema.prisma
+- [ ] T025 [P] [US2] Four-file module for [name] under apps/api/src/modules/[name]/ (Art 6)
+- [ ] T026 [US2] Regenerate packages/types; consume the endpoint in apps/[web|admin]
+- [ ] T027 [US2] Cross-module reads go through the other module's service, never its repository (Art 6)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -127,16 +142,16 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 3 (MANDATORY for Article 26 risk areas) ⚠️
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T028 [P] [US3] Contract test for [endpoint] in apps/api/tests/integration/[name].test.ts
+- [ ] T029 [P] [US3] Reduced-motion snapshot; keyboard-only pass (Art 19, 24, 26)
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T030 [US3] Schema + migration for [Entity] in apps/api/prisma/schema.prisma
+- [ ] T031 [P] [US3] Four-file module for [name] under apps/api/src/modules/[name]/ (Art 6)
+- [ ] T032 [US3] Regenerate packages/types; consume the endpoint in apps/[web|admin]
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -150,12 +165,14 @@ Examples of foundational tasks (adjust based on your project):
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
+- [ ] TXXX [P] docs/api.md error-code registry complete and current (Art 9)
+- [ ] TXXX [P] JSON-LD, per-locale metadata, OG images, sitemap/robots, /pasca-menu/ 301 (Art 16)
+- [ ] TXXX Lighthouse on the deployed mobile build: ≥95 perf / 100 a11y / 100 SEO; LCP < 2.0s; CLS < 0.05 (Art 24)
+- [ ] TXXX Contrast audit — no gold body copy; 320px width; keyboard-only; screen-reader pass (Art 24)
+- [ ] TXXX k6 load run on GET /menu and POST /reservations at 200 concurrent (Art 26)
+- [ ] TXXX Verify no mock data remains and every UI path hits the real endpoint (Art 4, 27)
+- [ ] TXXX [P] Additional unit tests in apps/api/tests/unit/
+- [ ] TXXX Definition-of-done gate: pnpm lint && pnpm typecheck && pnpm test && pnpm build green (Art 27)
 
 ---
 
@@ -178,7 +195,7 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Within Each User Story
 
-- Tests (if included) MUST be written and FAIL before implementation
+- Article 26 tests MUST be written and MUST FAIL before implementation
 - Models before services
 - Services before endpoints
 - Core implementation before integration
@@ -189,7 +206,7 @@ Examples of foundational tasks (adjust based on your project):
 - All Setup tasks marked [P] can run in parallel
 - All Foundational tasks marked [P] can run in parallel (within Phase 2)
 - Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
-- All tests for a user story marked [P] can run in parallel
+- All tests for a user story marked [P] can run in parallel (except the booking concurrency test, which must run against a real DB and must not be parallelised with other booking tests)
 - Models within a story marked [P] can run in parallel
 - Different user stories can be worked on in parallel by different team members
 
@@ -198,13 +215,13 @@ Examples of foundational tasks (adjust based on your project):
 ## Parallel Example: User Story 1
 
 ```bash
-# Launch all tests for User Story 1 together (if tests requested):
-Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
-Task: "Integration test for [user journey] in tests/integration/test_[name].py"
+# Launch all tests for User Story 1 together:
+Task: "Contract test for [endpoint] in apps/api/tests/integration/[name].test.ts"
+Task: "Permission matrix test for [endpoint] in apps/api/tests/permissions/[name].test.ts"
 
 # Launch all models for User Story 1 together:
-Task: "Create [Entity1] model in src/models/[entity1].py"
-Task: "Create [Entity2] model in src/models/[entity2].py"
+Task: "Zod DTOs in apps/api/src/modules/[name]/[name].schema.ts"
+Task: "Repository in apps/api/src/modules/[name]/[name].repository.ts"
 ```
 
 ---

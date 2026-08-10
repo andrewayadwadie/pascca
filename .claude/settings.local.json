@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(specify init *)",
-      "PowerShell(specify init *)"
+      "PowerShell(specify init *)",
+      "Bash(mkdir -p .claude/commands .claude/agents)",
+      "Bash(touch .claude/commands/.gitkeep .claude/agents/.gitkeep)",
+      "PowerShell(.specify\\\\extensions\\\\git\\\\scripts\\\\powershell\\\\initialize-repo.ps1)",
+      "Bash(python -)",
+      "PowerShell(git remote *)",
+      "PowerShell(git add *)"
     ]
   }
 }

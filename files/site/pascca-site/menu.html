@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Menu — Pascca | Pizza, Pasta, Calzone &amp; Breakfast in Cairo</title>
+<meta name="description" content="The full Pascca menu with prices: stone-oven pizza, calzone, Italian pasta, steaks, breakfast platters and desserts. Fasting and vegetarian dishes marked.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=zodiak@400,401,700,701&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav id="nv">
+  <div class="nav-l"><a href="menu.html">Menu</a><a href="about.html">About</a><a href="gallery.html">Gallery</a></div>
+  <a href="index.html" class="brand"><b>PASCCA</b><span>Ristorante</span></a>
+  <div class="nav-r">
+    <a href="branches.html" class="acct">Branches</a>
+    <a href="reservations.html" class="btn btn-g btn-sm">Book a table</a>
+    <button class="brg" id="bg" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div id="ov">
+  <span class="x" id="cx">Close ✕</span>
+  <a href="menu.html">Menu</a><a href="about.html">About</a><a href="gallery.html">Gallery</a>
+  <a href="branches.html">Branches</a><a href="reservations.html">Reservations</a><a href="contact.html">Contact</a>
+</div>
+
+<header class="phero">
+  <div class="enter">
+    <span class="crumb"><a href="index.html">Home</a> — Menu</span>
+    <h1>Everything we <em>bake and plate</em></h1>
+    <p class="lede">Prices in Egyptian pounds, the same at both branches. Fasting and vegetarian dishes are marked — use the filters to see only those.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="filters rv" id="filters">
+      <button class="on" data-filter="all">Everything</button>
+      <button data-filter="pizza">Pizza</button>
+      <button data-filter="calzone">Calzone</button>
+      <button data-filter="pasta">Pasta</button>
+      <button data-filter="mains">Mains</button>
+      <button data-filter="starters">Starters</button>
+      <button data-filter="breakfast">Breakfast</button>
+      <button data-filter="desserts">Desserts</button>
+      <button data-filter="drinks">Drinks</button>
+      <button data-filter="fasting">Fasting only</button>
+      <button data-filter="veg">Vegetarian only</button>
+    </div>
+
+    <!-- PIZZA -->
+    <div data-group id="pizza" class="rv" style="margin-bottom:56px">
+      <h3 style="margin-bottom:6px">From the stone oven</h3>
+      <p class="lede" style="margin-bottom:20px">Dough proved in-house, sauce made every morning.</p>
+      <div class="mrow" data-cat="pizza" data-fasting="1" data-veg="1">
+        <div class="ph ph-warm"><span>Photo</span></div>
+        <div><h4>Margherita <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Mozzarella, house tomato sauce and fresh basil.</p></div>
+        <span class="pr">165</span>
+      </div>
+      <div class="mrow" data-cat="pizza" data-fasting="0" data-veg="1">
+        <div class="ph ph-gold"><span>Photo</span></div>
+        <div><h4>Quattro Formaggi <span class="chip">Veg</span></h4><p>Four cheeses finished with honey and toasted nuts.</p></div>
+        <span class="pr">235</span>
+      </div>
+      <div class="mrow" data-cat="pizza" data-fasting="0" data-veg="0">
+        <div class="ph ph-ember"><span>Photo</span></div>
+        <div><h4>Pepperoni</h4><p>Smoked pepperoni, mozzarella and a drizzle of chilli oil.</p></div>
+        <span class="pr">215</span>
+      </div>
+      <div class="mrow" data-cat="pizza" data-fasting="0" data-veg="0">
+        <div class="ph ph-stone"><span>Photo</span></div>
+        <div><h4>Chicken Ranch</h4><p>Grilled chicken, ranch, sweetcorn and mozzarella.</p></div>
+        <span class="pr">225</span>
+      </div>
+      <div class="mrow" data-cat="pizza" data-fasting="1" data-veg="1">
+        <div class="ph ph-herb"><span>Photo</span></div>
+        <div><h4>Vegetable <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Peppers, mushrooms, olives and red onion. A guest favourite.</p></div>
+        <span class="pr">175</span>
+      </div>
+      <div class="mrow" data-cat="pizza" data-fasting="1" data-veg="0">
+        <div class="ph ph-cream"><span>Photo</span></div>
+        <div><h4>Frutti di Mare <span class="chip chip-g">Fasting</span></h4><p>Prawns and calamari with garlic, parsley and olive oil.</p></div>
+        <span class="pr">285</span>
+      </div>
+    </div>
+
+    <!-- CALZONE -->
+    <div data-group id="calzone" class="rv" style="margin-bottom:56px">
+      <h3 style="margin-bottom:6px">Calzone</h3>
+      <p class="lede" style="margin-bottom:20px">Folded, sealed, baked. Guests keep calling these the best in Cairo.</p>
+      <div class="mrow" data-cat="calzone" data-fasting="0" data-veg="0">
+        <div class="ph ph-warm"><span>Photo</span></div>
+        <div><h4>Classic Calzone</h4><p>Mozzarella, mushrooms and salami, sealed and stone-baked.</p></div>
+        <span class="pr">210</span>
+      </div>
+      <div class="mrow" data-cat="calzone" data-fasting="0" data-veg="0">
+        <div class="ph ph-gold"><span>Photo</span></div>
+        <div><h4>Chicken Calzone</h4><p>Grilled chicken, peppers and a three-cheese blend.</p></div>
+        <span class="pr">225</span>
+      </div>
+      <div class="mrow" data-cat="calzone" data-fasting="1" data-veg="1">
+        <div class="ph ph-herb"><span>Photo</span></div>
+        <div><h4>Vegetable Calzone <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Seasonal vegetables, olives and herbs.</p></div>
+        <span class="pr">195</span>
+      </div>
+    </div>
+
+    <!-- PASTA -->
+    <div data-group id="pasta" class="rv" style="margin-bottom:56px">
+      <h3 style="margin-bottom:6px">Pasta</h3>
+      <p class="lede" style="margin-bottom:20px">Cooked to order, never held.</p>
+      <div class="mrow" data-cat="pasta" data-fasting="0" data-veg="1">
+        <div class="ph ph-gold"><span>Photo</span></div>
+        <div><h4>Truffle Pasta <span class="chip">Veg</span></h4><p>Cream, aged parmesan and truffle. The most filmed dish we serve.</p></div>
+        <span class="pr">245</span>
+      </div>
+      <div class="mrow" data-cat="pasta" data-fasting="0" data-veg="0">
+        <div class="ph ph-stone"><span>Photo</span></div>
+        <div><h4>Shrimp Alfredo</h4><p>Fresh prawns folded through alfredo at the pass.</p></div>
+        <span class="pr">265</span>
+      </div>
+      <div class="mrow" data-cat="pasta" data-fasting="0" data-veg="0">
+        <div class="ph ph-ember"><span>Photo</span></div>
+        <div><h4>Macarona Béchamel</h4><p>The Egyptian classic, baked golden. Order it and plan a nap.</p></div>
+        <span class="pr">190</span>
+      </div>
+      <div class="mrow" data-cat="pasta" data-fasting="1" data-veg="1">
+        <div class="ph ph-herb"><span>Photo</span></div>
+        <div><h4>Penne Arrabbiata <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Spicy tomato, garlic and basil.</p></div>
+        <span class="pr">155</span>
+      </div>
+      <div class="mrow" data-cat="pasta" data-fasting="0" data-veg="0">
+        <div class="ph ph-cream"><span>Photo</span></div>
+        <div><h4>Beef Lasagna</h4><p>Layered pasta, slow beef ragù and béchamel.</p></div>
+        <span class="pr">230</span>
+      </div>
+    </div>
+
+    <!-- MAINS -->
+    <div data-group id="mains" class="rv" style="margin-bottom:56px">
+      <h3 style="margin-bottom:6px">Mains</h3>
+      <p class="lede" style="margin-bottom:20px">Grilled to order with a choice of sauce and side.</p>
+      <div class="mrow" data-cat="mains" data-fasting="0" data-veg="0">
+        <div class="ph ph-ember"><span>Photo</span></div>
+        <div><h4>Beef Steak</h4><p>Choose mushroom or pepper sauce, with wedges or grilled vegetables.</p></div>
+        <span class="pr">395</span>
+      </div>
+      <div class="mrow" data-cat="mains" data-fasting="0" data-veg="0">
+        <div class="ph ph-warm"><span>Photo</span></div>
+        <div><h4>Grilled Chicken Breast</h4><p>Marinated overnight, served with lemon butter.</p></div>
+        <span class="pr">255</span>
+      </div>
+      <div class="mrow" data-cat="mains" data-fasting="1" data-veg="0">
+        <div class="ph ph-stone"><span>Photo</span></div>
+        <div><h4>Grilled Prawns <span class="chip chip-g">Fasting</span></h4><p>Garlic, chilli and parsley, with rice or salad.</p></div>
+        <span class="pr">340</span>
+      </div>
+    </div>
+
+    <!-- STARTERS -->
+    <div data-group id="starters" class="rv" style="margin-bottom:56px">
+      <h3 style="margin-bottom:6px">Starters &amp; sides</h3>
+      <p class="lede" style="margin-bottom:20px">Built for sharing.</p>
+      <div class="mrow" data-cat="starters" data-fasting="0" data-veg="1">
+        <div class="ph ph-gold"><span>Photo</span></div>
+        <div><h4>Cheddar Fries <span class="chip">Veg</span></h4><p>Reviewed as the cheesiest in Cairo. We take that seriously.</p></div>
+        <span class="pr">110</span>
+      </div>
+      <div class="mrow" data-cat="starters" data-fasting="1" data-veg="1">
+        <div class="ph ph-warm"><span>Photo</span></div>
+        <div><h4>Bruschetta <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Oven bread, tomato, garlic and basil.</p></div>
+        <span class="pr">85</span>
+      </div>
+      <div class="mrow" data-cat="starters" data-fasting="1" data-veg="1">
+        <div class="ph ph-herb"><span>Photo</span></div>
+        <div><h4>Onion Soup <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Caramelised onion and toasted bread.</p></div>
+        <span class="pr">95</span>
+      </div>
+      <div class="mrow" data-cat="starters" data-fasting="0" data-veg="1">
+        <div class="ph ph-cream"><span>Photo</span></div>
+        <div><h4>Caesar Salad <span class="chip">Veg</span></h4><p>Romaine, croutons and parmesan. Add chicken for 45.</p></div>
+        <span class="pr">130</span>
+      </div>
+    </div>
+
+    <!-- BREAKFAST -->
+    <div data-group id="breakfast" class="rv" style="margin-bottom:56px">
+      <h3 style="margin-bottom:6px">Breakfast</h3>
+      <p class="lede" style="margin-bottom:20px">From 8am at both branches. Friday mornings fill up early.</p>
+      <div class="mrow" data-cat="breakfast" data-fasting="0" data-veg="0">
+        <div class="ph ph-warm"><span>Photo</span></div>
+        <div><h4>Pascca Breakfast Platter</h4><p>Eggs, cheeses, foul, bread and a hot drink. Built for two.</p></div>
+        <span class="pr">260</span>
+      </div>
+      <div class="mrow" data-cat="breakfast" data-fasting="0" data-veg="1">
+        <div class="ph ph-ember"><span>Photo</span></div>
+        <div><h4>Shakshuka <span class="chip">Veg</span></h4><p>Eggs, tomato and peppers in a cast-iron pan.</p></div>
+        <span class="pr">115</span>
+      </div>
+      <div class="mrow" data-cat="breakfast" data-fasting="0" data-veg="1">
+        <div class="ph ph-gold"><span>Photo</span></div>
+        <div><h4>Pancakes <span class="chip">Veg</span></h4><p>Four pieces with honey and butter.</p></div>
+        <span class="pr">120</span>
+      </div>
+      <div class="mrow" data-cat="breakfast" data-fasting="1" data-veg="1">
+        <div class="ph ph-herb"><span>Photo</span></div>
+        <div><h4>Foul &amp; Falafel <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Olive oil, lemon and cumin, with fresh bread.</p></div>
+        <span class="pr">90</span>
+      </div>
+    </div>
+
+    <!-- DESSERTS -->
+    <div data-group id="desserts" class="rv" style="margin-bottom:56px">
+      <h3 style="margin-bottom:6px">Desserts</h3>
+      <p class="lede" style="margin-bottom:20px">Yes, including a pizza.</p>
+      <div class="mrow" data-cat="desserts" data-fasting="0" data-veg="1">
+        <div class="ph ph-ember"><span>Photo</span></div>
+        <div><h4>Dessert Pizza <span class="chip">Veg</span></h4><p>The same dough, finished with chocolate and nuts.</p></div>
+        <span class="pr">165</span>
+      </div>
+      <div class="mrow" data-cat="desserts" data-fasting="0" data-veg="1">
+        <div class="ph ph-warm"><span>Photo</span></div>
+        <div><h4>Tiramisu <span class="chip">Veg</span></h4><p>Mascarpone, espresso and cocoa.</p></div>
+        <span class="pr">135</span>
+      </div>
+      <div class="mrow" data-cat="desserts" data-fasting="1" data-veg="1">
+        <div class="ph ph-cream"><span>Photo</span></div>
+        <div><h4>Seasonal Fruit <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Whatever the market had that morning.</p></div>
+        <span class="pr">95</span>
+      </div>
+    </div>
+
+    <!-- DRINKS -->
+    <div data-group id="drinks" class="rv">
+      <h3 style="margin-bottom:6px">Drinks</h3>
+      <p class="lede" style="margin-bottom:20px">Coffee, juice and the rest.</p>
+      <div class="mrow" data-cat="drinks" data-fasting="1" data-veg="1">
+        <div class="ph ph-stone"><span>Photo</span></div>
+        <div><h4>Espresso Doppio <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Beans roasted for us.</p></div>
+        <span class="pr">55</span>
+      </div>
+      <div class="mrow" data-cat="drinks" data-fasting="0" data-veg="1">
+        <div class="ph ph-cream"><span>Photo</span></div>
+        <div><h4>Cappuccino <span class="chip">Veg</span></h4><p>Espresso and steamed milk.</p></div>
+        <span class="pr">75</span>
+      </div>
+      <div class="mrow" data-cat="drinks" data-fasting="1" data-veg="1">
+        <div class="ph ph-gold"><span>Photo</span></div>
+        <div><h4>Fresh Orange <span class="chip chip-g">Fasting</span><span class="chip">Veg</span></h4><p>Squeezed to order.</p></div>
+        <span class="pr">70</span>
+      </div>
+    </div>
+
+    <p class="note rv" style="margin-top:44px">Demo prices — the client enters real prices from the dashboard</p>
+  </div>
+</section>
+
+<section class="tight">
+  <div class="wrap panel panel-glow rv" style="text-align:center">
+    <h2 style="margin:0 auto;max-width:16ch">Seen something <em>you want</em>?</h2>
+    <div class="acts" style="justify-content:center;margin-top:30px">
+      <a href="reservations.html" class="btn btn-g">Book a table</a>
+      <a href="https://www.talabat.com/egypt/pascca" target="_blank" rel="noopener" class="btn btn-o">Order delivery</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fc">
+    <div class="fbrand"><b>PASCCA</b><span>Ristorante</span>
+      <p>Pizza, pasta and breakfast, freshly baked with love. Serving Heliopolis and Shobra since 2018.</p></div>
+    <div><h5>Explore</h5><ul class="plain">
+      <li><a href="menu.html">Menu</a></li><li><a href="about.html">About</a></li>
+      <li><a href="gallery.html">Gallery</a></li><li><a href="branches.html">Branches</a></li>
+      <li><a href="reservations.html">Reservations</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+    <div><h5>Hours of service</h5><ul>
+      <li><span>Shobra</span><b>12pm — 2am</b></li><li><span>Heliopolis</span><b>24 hours</b></li>
+      <li><span>Breakfast</span><b>From 8am</b></li></ul></div>
+    <div><h5>Visit us</h5><ul class="visit plain">
+      <li><i>◉</i><span>273 Shobra St., Cairo<br>40 Abd El-Aziz Fahmy St., El-Nozha</span></li>
+      <li><i>✆</i><span><a href="tel:01201251110">0120 125 1110</a> · <a href="tel:01101148075">0110 114 8075</a></span></li>
+      <li><i>✉</i><a href="mailto:Pasccapizzeria@gmail.com">Pasccapizzeria@gmail.com</a></li></ul></div>
+  </div>
+  <div class="fbar">
+    <ul><li><a href="legal.html">Privacy</a></li><li><a href="legal.html#terms">Terms</a></li>
+      <li><a href="https://www.instagram.com/pasccarestaurant/" target="_blank" rel="noopener">Instagram</a></li>
+      <li><a href="https://www.facebook.com/pasccaRestaurant/" target="_blank" rel="noopener">Facebook</a></li></ul>
+    <span>© 2026 Pascca Restaurant</span>
+  </div>
+</footer>
+
+<div class="mcta"><a href="menu.html" class="m">Menu</a><a href="reservations.html" class="b">Book</a></div>
+<script src="assets/app.js"></script>
+</body>
+</html>

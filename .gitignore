@@ -1,0 +1,20 @@
+# Claude Code — local, machine-specific
+.claude/settings.local.json
+.claude/*.local.json
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Logs / temp
+*.log
+tmp/

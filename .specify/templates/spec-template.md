@@ -95,6 +95,25 @@
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
+### Always-On Requirements
+
+These come from the constitution and apply to every feature. State how this feature satisfies
+each, or `N/A` with a reason — do not delete the rows.
+
+- **AR-001** (Art 3): Content this feature displays is DB-backed and editable from the dashboard —
+  [which fields, or N/A]
+- **AR-002** (Art 4): Every capability is exposed as a `/api/v1` endpoint a mobile client could
+  call — [which endpoints]
+- **AR-003** (Art 14/23): Every user-facing string exists in `ar` and `en`; the Arabic RTL layout
+  is a first-class case, not a follow-up — [which surfaces]
+- **AR-004** (Art 9): Failure modes and their permanent error codes — [e.g. `RES_SLOT_UNAVAILABLE`]
+- **AR-005** (Art 10): Who may do this, per role, and what an unauthorised user sees (nothing
+  rendered — not a disabled control) — [ADMIN / MODERATOR / CUSTOMER / public]
+- **AR-006** (Art 12): Mutations that need soft delete, an `AuditLog` diff, or a
+  `ReservationEvent` — [which, or N/A]
+- **AR-007** (Art 24): Accessibility obligations this feature introduces (labels, `aria-label`,
+  focus order, screen-reader announcements, contrast) — [which]
+
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
@@ -126,3 +145,20 @@
 - [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
 - [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
 - [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+
+## Constitution Impact *(mandatory)*
+
+<!--
+  Full gate table lives in the plan. This section exists so scope problems surface
+  before planning starts.
+-->
+
+**Articles this feature is governed by**: [e.g. 2, 4, 9, 10, 11, 12, 14, 26]
+
+**Non-negotiable [NN] articles touched**: [list, or "none"]
+
+**Out of scope by Article 1**: confirm this feature contains no ordering, payment, loyalty, or
+delivery-tracking work — not even scaffolding or a stubbed table. [Confirmed / explain]
+
+**Amendment needed?**: [No / Yes — name the article, the reason, and what breaks. If Yes, stop
+and get sign-off before `/speckit-plan`. Article 30 forbids routing around a blocking article.]
