@@ -50,10 +50,12 @@ function modelByName(name: string) {
 describe("schema shape: models exist", () => {
   // FR-001 — the 22 requested models plus PageSeo (data-model.md Domain 6 — SEO is per-page,
   // not per-block, so it cannot live inside PageBlock's JSON value without duplicating across
-  // every block on a page).
+  // every block on a page). RolePermission added by 003-auth-authorization (data-model.md) —
+  // the seeded role→permission map Article 14 [NN] requires.
   const expectedModels = [
     "User",
     "RefreshToken",
+    "RolePermission",
     "Branch",
     "BranchHour",
     "BranchClosure",
@@ -82,7 +84,7 @@ describe("schema shape: models exist", () => {
     expect(models.some((m) => m.name === name)).toBe(true);
   });
 
-  it("declares exactly 23 models (no stray extras, none missing)", () => {
+  it("declares exactly 24 models (no stray extras, none missing)", () => {
     expect(models.map((m) => m.name).sort()).toEqual([...expectedModels].sort());
   });
 });

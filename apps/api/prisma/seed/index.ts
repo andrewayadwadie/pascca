@@ -15,6 +15,7 @@ import { seedGallery } from "./gallery";
 import { seedMarketing } from "./marketing";
 import { seedPageContent } from "./page-content";
 import { seedReservations } from "./reservations";
+import { seedPermissions } from "./permissions";
 
 export interface SeedCounts {
   siteSettings: number;
@@ -38,6 +39,7 @@ export interface SeedCounts {
   contactMessages: number;
   reservations: number;
   reservationEvents: number;
+  rolePermissions: number;
 }
 
 export async function runSeed(prisma: PrismaClient): Promise<SeedCounts> {
@@ -49,6 +51,7 @@ export async function runSeed(prisma: PrismaClient): Promise<SeedCounts> {
   await seedMarketing(prisma, branches, users);
   await seedPageContent(prisma);
   await seedReservations(prisma, branches, users);
+  await seedPermissions(prisma);
 
   return {
     siteSettings: await prisma.siteSetting.count(),
@@ -72,5 +75,6 @@ export async function runSeed(prisma: PrismaClient): Promise<SeedCounts> {
     contactMessages: await prisma.contactMessage.count(),
     reservations: await prisma.reservation.count(),
     reservationEvents: await prisma.reservationEvent.count(),
+    rolePermissions: await prisma.rolePermission.count(),
   };
 }

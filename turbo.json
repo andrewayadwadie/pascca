@@ -23,7 +23,23 @@
       // though the shell that invoked `turbo` has it. apps/api's database-backed suites
       // (002-content-schema-seed) need DATABASE_URL; listing it here also puts it in the task's
       // cache key, so a changed DB URL correctly busts the cache instead of serving a stale pass.
-      "env": ["DATABASE_URL"]
+      // 003-auth-authorization: the HTTP-level auth/permissions suites build a real app
+      // (`buildApp(loadEnv())`), which needs the FULL env schema satisfied, not just the
+      // database — REDIS_URL (rate-limit store), the two auth secrets, S3_* and CORS_ORIGINS
+      // (env.ts has no defaults for any of these; a missing one fails `loadEnv()` at import time
+      // for the whole test file, not just the tests that would have used it).
+      "env": [
+        "DATABASE_URL",
+        "REDIS_URL",
+        "JWT_ACCESS_SECRET",
+        "COOKIE_SECRET",
+        "S3_ENDPOINT",
+        "S3_REGION",
+        "S3_ACCESS_KEY_ID",
+        "S3_SECRET_ACCESS_KEY",
+        "S3_BUCKET",
+        "CORS_ORIGINS"
+      ]
     }
   }
 }

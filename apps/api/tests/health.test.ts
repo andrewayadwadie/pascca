@@ -21,6 +21,9 @@ const UNREACHABLE: Env = {
   S3_SECRET_ACCESS_KEY: "secret",
   S3_BUCKET: "bucket",
   CORS_ORIGINS: ["http://localhost:3000"],
+  // 003-auth-authorization: unused by checkInfrastructure() itself, but Env requires them.
+  JWT_ACCESS_SECRET: "a".repeat(32),
+  COOKIE_SECRET: "b".repeat(32),
 };
 
 describe("checkInfrastructure — no retry loop (FR-014)", () => {
