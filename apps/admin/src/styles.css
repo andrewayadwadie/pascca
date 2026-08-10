@@ -1,0 +1,4 @@
+/* Article 16 [NN]: this file defines NO colour, radius, spacing, or motion value of its own —
+   same rule as apps/web/src/styles/globals.css. Every design value comes from the single
+   shared source. */
+@import "@pascca/config/tokens.css";

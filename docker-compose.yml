@@ -1,0 +1,56 @@
+# Local development infrastructure only (FR-009, research R10). No production credential,
+# bucket, or account is touched by this file. MinIO stands in for Cloudflare R2 — both are
+# S3-compatible, so one set of S3_* env vars serves local and production (contracts/env.md).
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pascca
+      POSTGRES_PASSWORD: pascca
+      POSTGRES_DB: pascca
+    ports:
+      - "5432:5432"
+    volumes:
+      - pascca_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pascca -d pascca"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - pascca_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: pascca
+      MINIO_ROOT_PASSWORD: pascca123
+    ports:
+      - "9000:9000" # S3 API — matches S3_ENDPOINT in .env.example
+      - "9001:9001" # web console
+    volumes:
+      - pascca_minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pascca_postgres_data:
+  pascca_redis_data:
+  pascca_minio_data:

@@ -8,8 +8,9 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: **MANDATORY** for every risk area in Article 26 that this feature touches — availability,
-booking concurrency, permissions, auth token rotation, i18n/RTL, dashboard authorisation, load.
+**Tests**: **MANDATORY** for every risk area in Article 30 that this feature touches — availability,
+booking concurrency, confirmation policy, permissions, auth token rotation, Tier-2 content
+fallback, testimonial consent, i18n, a11y, load.
 Tests for those areas are not negotiable and a phase is not complete without them. Tests outside
 those areas are added where they earn their keep, not for coverage theatre.
 
@@ -23,15 +24,15 @@ those areas are added where they earn their keep, not for coverage theatre.
 
 ## Path Conventions
 
-Fixed by the constitution (Articles 5, 6, 14, 21). Use these, not the generic `src/`:
+Fixed by the constitution (Articles 6, 8, 16, 21). Use these, not the generic `src/`:
 
 - **API**: `apps/api/src/modules/<name>/` — exactly `<name>.routes.ts`, `.service.ts`,
-  `.repository.ts`, `.schema.ts` (Art 6). Tests in `apps/api/tests/`.
-- **Website**: `apps/web/app/[locale]/…`, strings in `apps/web/messages/{ar,en}.json`
-- **Dashboard**: `apps/admin/src/routes/…`, strings in `apps/admin/messages/{ar,en}.json`
+  `.repository.ts`, `.schema.ts` (Art 7). Tests in `apps/api/tests/`.
+- **Website**: `apps/web/src/app/[locale]/…`, strings in `apps/web/messages/{en,ar}.json`
+- **Dashboard**: `apps/admin/src/routes/…`, strings in `apps/admin/messages/{en,ar}.json`
 - **Shared**: `packages/types` (generated from OpenAPI — never hand-edited),
   `packages/config/tokens.css`
-- **Schema**: `apps/api/prisma/schema.prisma` · **Error codes**: `docs/api.md`
+- **Schema**: `apps/api/prisma/schema.prisma` · **Error codes**: `docs/api.md` (Art 10)
 
 <!-- 
   ============================================================================
@@ -58,7 +59,7 @@ Fixed by the constitution (Articles 5, 6, 14, 21). Use these, not the generic `s
 
 - [ ] T001 Create the monorepo layout per plan.md (apps/api, apps/web, apps/admin, packages/*)
 - [ ] T002 Initialize pnpm workspace + TypeScript project references
-- [ ] T003 [P] Configure ESLint, Prettier, and the lint rules that enforce Articles 6, 14, and 17
+- [ ] T003 [P] Configure ESLint, Prettier, and the lint rules that enforce Articles 7, 16, and 21
 
 ---
 
@@ -70,15 +71,15 @@ Fixed by the constitution (Articles 5, 6, 14, 21). Use these, not the generic `s
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Prisma schema + migration framework, designed so Phase 9 ordering needs no table changes (Art 8)
-- [ ] T005 [P] Zod env schema in apps/api/src/config/env.ts — fail fast at boot; update .env.example (Art 13)
-- [ ] T006 [P] Response envelope + error-code registry wired to docs/api.md (Art 9)
-- [ ] T007 Seeded role→permission map + requirePermission preHandler (Art 10)
-- [ ] T008 [P] Security plugins: helmet, CORS allow-list, rate limits, argon2, refresh rotation with reuse detection (Art 25)
-- [ ] T009 AuditLog writer + soft-delete convention (Art 12)
-- [ ] T010 [P] packages/config/tokens.css + font binding on html[lang] (Art 17)
-- [ ] T011 [P] i18n scaffolding: ar default, RTL default, messages/{ar,en}.json, hreflang (Art 14)
-- [ ] T012 OpenAPI 3.1 emission + packages/types generation pipeline (Art 5)
+- [ ] T004 Prisma schema + migration framework, designed so Phase 9 ordering needs no table changes (Art 11)
+- [ ] T005 [P] Zod env schema in apps/api/src/config/env.ts — fail fast at boot, name the variable never its value; update .env.example (Art 8, 29)
+- [ ] T006 [P] Response envelope + error-code registry wired to docs/api.md (Art 10)
+- [ ] T007 Seeded role→permission map + requirePermission preHandler (Art 14)
+- [ ] T008 [P] Security plugins: helmet, CORS allow-list (never `*`), rate limits, argon2, refresh rotation with reuse detection (Art 29)
+- [ ] T009 AuditLog writer + soft-delete convention (Art 15)
+- [ ] T010 [P] packages/config/tokens.css + self-hosted Zodiak/Plus Jakarta Sans bound on html[lang] (Art 16)
+- [ ] T011 [P] i18n scaffolding: en default, ar registered behind a flag, messages/{en,ar}.json, logical CSS properties (Art 21)
+- [ ] T012 OpenAPI 3.1 emission + packages/types generation pipeline (Art 8)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -90,7 +91,7 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (MANDATORY for Article 26 risk areas) ⚠️
+### Tests for User Story 1 (MANDATORY for Article 30 risk areas) ⚠️
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
@@ -99,16 +100,16 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Add [Entity] to apps/api/prisma/schema.prisma + migration (Art 5, 8)
-- [ ] T013 [P] [US1] Zod DTOs in apps/api/src/modules/[name]/[name].schema.ts (Art 6)
-- [ ] T014 [P] [US1] Repository in apps/api/src/modules/[name]/[name].repository.ts — Prisma only, no business rules (Art 6)
-- [ ] T015 [US1] Service in apps/api/src/modules/[name]/[name].service.ts — no req/reply/status codes (Art 6)
-- [ ] T016 [US1] Routes in apps/api/src/modules/[name]/[name].routes.ts with swagger schema + requirePermission (Art 6, 10)
-- [ ] T017 [US1] Register error codes for this module in docs/api.md (Art 9)
-- [ ] T018 [US1] Wire AuditLog diff on every mutation; soft delete where applicable (Art 12)
-- [ ] T019 [US1] Regenerate packages/types from the OpenAPI spec (Art 5)
-- [ ] T020 [P] [US1] ar + en strings in messages/{ar,en}.json — no literals in components (Art 14)
-- [ ] T021 [US1] UI in apps/[web|admin] consuming the real endpoint, logical CSS properties only (Art 4, 14, 17)
+- [ ] T012 [US1] Add [Entity] to apps/api/prisma/schema.prisma + migration (Art 8, 11)
+- [ ] T013 [P] [US1] Zod DTOs in apps/api/src/modules/[name]/[name].schema.ts (Art 7)
+- [ ] T014 [P] [US1] Repository in apps/api/src/modules/[name]/[name].repository.ts — Prisma only, no business rules (Art 7)
+- [ ] T015 [US1] Service in apps/api/src/modules/[name]/[name].service.ts — no req/reply/status codes (Art 7)
+- [ ] T016 [US1] Routes in apps/api/src/modules/[name]/[name].routes.ts with swagger schema + requirePermission (Art 7, 14)
+- [ ] T017 [US1] Register error codes for this module in docs/api.md (Art 10)
+- [ ] T018 [US1] Wire AuditLog diff on every mutation; soft delete where applicable (Art 15)
+- [ ] T019 [US1] Regenerate packages/types from the OpenAPI spec (Art 8)
+- [ ] T020 [P] [US1] en (+ ar) strings in messages/{en,ar}.json — no literals in components (Art 12, 21)
+- [ ] T021 [US1] UI in apps/[web|admin] consuming the real endpoint, logical CSS properties only, tokens from tokens.css (Art 4, 16, 21)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -120,17 +121,17 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 (MANDATORY for Article 26 risk areas) ⚠️
+### Tests for User Story 2 (MANDATORY for Article 30 risk areas) ⚠️
 
 - [ ] T022 [P] [US2] Contract test for [endpoint] in apps/api/tests/integration/[name].test.ts
-- [ ] T023 [P] [US2] i18n test: AR↔EN switch preserves state; RTL snapshot (Art 14, 26)
+- [ ] T023 [P] [US2] i18n test: locale routing works with ar disabled; no hardcoded strings (Art 21, 30)
 
 ### Implementation for User Story 2
 
 - [ ] T024 [US2] Schema + migration for [Entity] in apps/api/prisma/schema.prisma
-- [ ] T025 [P] [US2] Four-file module for [name] under apps/api/src/modules/[name]/ (Art 6)
+- [ ] T025 [P] [US2] Four-file module for [name] under apps/api/src/modules/[name]/ (Art 7)
 - [ ] T026 [US2] Regenerate packages/types; consume the endpoint in apps/[web|admin]
-- [ ] T027 [US2] Cross-module reads go through the other module's service, never its repository (Art 6)
+- [ ] T027 [US2] Cross-module reads go through the other module's service, never its repository (Art 7)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -142,15 +143,15 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 (MANDATORY for Article 26 risk areas) ⚠️
+### Tests for User Story 3 (MANDATORY for Article 30 risk areas) ⚠️
 
 - [ ] T028 [P] [US3] Contract test for [endpoint] in apps/api/tests/integration/[name].test.ts
-- [ ] T029 [P] [US3] Reduced-motion snapshot; keyboard-only pass (Art 19, 24, 26)
+- [ ] T029 [P] [US3] axe clean + reduced-motion snapshot; keyboard-only pass (Art 19, 28, 30)
 
 ### Implementation for User Story 3
 
 - [ ] T030 [US3] Schema + migration for [Entity] in apps/api/prisma/schema.prisma
-- [ ] T031 [P] [US3] Four-file module for [name] under apps/api/src/modules/[name]/ (Art 6)
+- [ ] T031 [P] [US3] Four-file module for [name] under apps/api/src/modules/[name]/ (Art 7)
 - [ ] T032 [US3] Regenerate packages/types; consume the endpoint in apps/[web|admin]
 
 **Checkpoint**: All user stories should now be independently functional
@@ -165,14 +166,14 @@ Examples of foundational tasks (adjust based on your project):
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] TXXX [P] docs/api.md error-code registry complete and current (Art 9)
+- [ ] TXXX [P] docs/api.md error-code registry complete and current (Art 10)
 - [ ] TXXX [P] JSON-LD, per-locale metadata, OG images, sitemap/robots, /pasca-menu/ 301 (Art 16)
-- [ ] TXXX Lighthouse on the deployed mobile build: ≥95 perf / 100 a11y / 100 SEO; LCP < 2.0s; CLS < 0.05 (Art 24)
-- [ ] TXXX Contrast audit — no gold body copy; 320px width; keyboard-only; screen-reader pass (Art 24)
-- [ ] TXXX k6 load run on GET /menu and POST /reservations at 200 concurrent (Art 26)
-- [ ] TXXX Verify no mock data remains and every UI path hits the real endpoint (Art 4, 27)
+- [ ] TXXX Lighthouse on the deployed mobile build: ≥95 perf / 100 a11y / 100 SEO; LCP < 2.0s; CLS < 0.05 (Art 28)
+- [ ] TXXX Contrast audit — no gold body copy; 320px width; keyboard-only; screen-reader pass (Art 28)
+- [ ] TXXX k6 load run on GET /menu and POST /reservations at 200 concurrent (Art 30)
+- [ ] TXXX Verify no mock data remains and every UI path hits the real endpoint (Art 4, 31)
 - [ ] TXXX [P] Additional unit tests in apps/api/tests/unit/
-- [ ] TXXX Definition-of-done gate: pnpm lint && pnpm typecheck && pnpm test && pnpm build green (Art 27)
+- [ ] TXXX Definition-of-done gate: pnpm lint && pnpm typecheck && pnpm test && pnpm build green (Art 31)
 
 ---
 
@@ -195,7 +196,7 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Within Each User Story
 
-- Article 26 tests MUST be written and MUST FAIL before implementation
+- Article 30 tests MUST be written and MUST FAIL before implementation
 - Models before services
 - Services before endpoints
 - Core implementation before integration

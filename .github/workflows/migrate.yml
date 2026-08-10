@@ -1,0 +1,58 @@
+name: Database Migration
+
+# Article 32 [NN] / FR-012: migrations are a separate, EXPLICITLY APPROVED step — never
+# automatic on deploy. This is the ONLY file in the repository with a migration step
+# (research R9). The guarantee is structural: `workflow_dispatch` is the only trigger (no
+# `push`, no `pull_request`), and the job runs under a protected GitHub Environment.
+#
+# ⚠ MANUAL SETUP REQUIRED, NOT DECLARABLE HERE: create the "production" environment in
+# Settings → Environments and add at least one required reviewer BEFORE this workflow is ever
+# dispatched for real. Until that reviewer exists, this approval gate is nominal — GitHub
+# Environment protection rules are a repository setting, not YAML (quickstart.md, research R9).
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "migrate" to confirm you intend to run a real migration'
+        required: true
+
+jobs:
+  migrate:
+    name: Run Prisma migration
+    runs-on: ubuntu-latest
+    # This environment name must match one created in Settings → Environments with a required
+    # reviewer configured. Without that manual step, dispatching this workflow does NOT wait for
+    # approval — see the warning above.
+    environment: production
+    steps:
+      - name: Confirm intent
+        if: ${{ github.event.inputs.confirm != 'migrate' }}
+        run: |
+          echo "::error::Input 'confirm' must be exactly 'migrate' — aborting without running anything."
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Prisma migrations
+        working-directory: apps/api
+        run: pnpm exec prisma migrate deploy
+        env:
+          # Sourced from the "production" GitHub Environment's own secrets (Settings →
+          # Environments → production → Environment secrets), never from a repository-wide
+          # secret — Article 29 [NN] scoping.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
