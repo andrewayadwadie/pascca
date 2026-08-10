@@ -1,0 +1,5 @@
+/* Article 16 [NN]: this file defines NO colour, radius, spacing, or motion value of its own.
+   Every design value comes from the single shared source. SC-005 depends on this staying true —
+   and the shared eslint config's no-restricted-syntax rule bans raw hex literals in app source
+   to help keep it that way. */
+@import "@pascca/config/tokens.css";

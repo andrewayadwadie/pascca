@@ -1,0 +1,16 @@
+// Article 11: build the phase in front of you. This file exists to make `prisma generate` and
+// the boot-time connectivity check work — nothing more. ZERO models ship in this feature; the
+// first entity feature (Article 12, Tier 1) adds the first one.
+//
+// Article 11's forward-looking obligation ("designed so Phase 9 ordering can be added without
+// altering existing tables") is trivially satisfied with zero tables and passes forward
+// untouched to whichever feature adds the first model.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}

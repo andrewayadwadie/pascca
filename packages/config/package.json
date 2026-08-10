@@ -1,0 +1,27 @@
+{
+  "name": "@pascca/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./eslint/base": "./eslint/base.js",
+    "./eslint/node": "./eslint/node.js",
+    "./eslint/react": "./eslint/react.js",
+    "./vitest/base": "./vitest/base.ts"
+  },
+  "scripts": {
+    "dev": "echo '@pascca/config has no dev server' && exit 0",
+    "build": "echo '@pascca/config has no build step' && exit 0",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.8"
+  }
+}

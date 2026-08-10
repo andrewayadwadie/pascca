@@ -1,0 +1,13 @@
+{
+  "extends": "@pascca/config/tsconfig/base.json",
+  "compilerOptions": {
+    // Reviewable exception to the shared base (research R12): apps/api runs via tsx, which
+    // needs Node-ESM-style explicit .ts extensions on relative imports. This option requires
+    // noEmit, which is why apps/api's build script is a no-op rather than `tsc` — see
+    // package.json.
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

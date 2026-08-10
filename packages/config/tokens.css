@@ -1,0 +1,15 @@
+:root{
+  /* surfaces */
+  --bg:#0A0A0A; --surface:#141414; --surface-2:#1B1B1B; --surface-3:#232323;
+  /* accent — the only accent */
+  --gold:#D4AF37; --gold-2:#F4A460; --gold-dim:rgba(212,175,55,.12);
+  /* ink */
+  --w:#FFFFFF; --w70:rgba(255,255,255,.7); --w60:rgba(255,255,255,.6);
+  --w50:rgba(255,255,255,.5); --w40:rgba(255,255,255,.4);
+  --w20:rgba(255,255,255,.2); --w10:rgba(255,255,255,.1); --w06:rgba(255,255,255,.06);
+  /* geometry */
+  --r-sm:14px; --r:24px; --r-lg:32px; --pill:999px;
+  --pad:clamp(20px,5vw,80px); --maxw:1440px;
+  /* motion */
+  --spring:cubic-bezier(0.175,0.885,0.32,1.275); --ease:cubic-bezier(.22,1,.36,1);
+}

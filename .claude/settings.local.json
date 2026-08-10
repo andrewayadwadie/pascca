@@ -8,7 +8,32 @@
       "PowerShell(.specify\\\\extensions\\\\git\\\\scripts\\\\powershell\\\\initialize-repo.ps1)",
       "Bash(python -)",
       "PowerShell(git remote *)",
-      "PowerShell(git add *)"
+      "PowerShell(git add *)",
+      "PowerShell(git push *)",
+      "PowerShell(& \"C:\\\\Users\\\\Dell\\\\Documents\\\\claude\\\\pascca\\\\.specify\\\\extensions\\\\git\\\\scripts\\\\powershell\\\\create-new-feature.ps1\" -Json -ShortName \"monorepo-scaffold\" \"Set up the Pascca monorepo per Article 6 of the constitution\")",
+      "PowerShell(.\\\\.specify\\\\scripts\\\\powershell\\\\check-prerequisites.ps1 -Json -PathsOnly)",
+      "PowerShell(.\\\\.specify\\\\scripts\\\\powershell\\\\setup-plan.ps1 -Json)",
+      "PowerShell(pnpm *)",
+      "PowerShell(.\\\\.specify\\\\scripts\\\\powershell\\\\setup-tasks.ps1 -Json)",
+      "PowerShell(.\\\\.specify\\\\scripts\\\\powershell\\\\check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm config *)",
+      "Bash(pnpm --version)",
+      "WebSearch",
+      "Bash(echo \"exit: $?\")",
+      "Bash(curl -s https://nodejs.org/dist/index.json)",
+      "Bash(node -e ' *)",
+      "Bash(curl -sL -o node22.zip \"https://nodejs.org/dist/v22.23.2/node-v22.23.2-win-x64.zip\")",
+      "Bash(unzip -q node22.zip)",
+      "Bash(./node-v22.23.2-win-x64/node.exe --version)",
+      "Bash(docker compose *)",
+      "Bash(\"/c/Program Files/Docker/Docker/Docker Desktop.exe\")",
+      "Bash(disown)",
+      "Bash(echo \"launched, pid: $!\")",
+      "Bash(tasklist //FI \"IMAGENAME eq node.exe\")",
+      "Bash(taskkill //F //PID 4920 //T)",
+      "Bash(taskkill //F //PID 6092 //T)",
+      "Bash(taskkill //F //PID 18092 //T)"
     ]
   }
 }

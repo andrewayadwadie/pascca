@@ -18,3 +18,15 @@ Thumbs.db
 # Logs / temp
 *.log
 tmp/
+
+# Node / pnpm / Turborepo
+node_modules/
+dist/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+
+# Portable Node 22 for local dev (Node mismatch workaround)
+.tools/

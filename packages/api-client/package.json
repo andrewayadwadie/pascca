@@ -1,0 +1,24 @@
+{
+  "name": "@pascca/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "echo '@pascca/api-client has no dev server' && exit 0",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.13.4"
+  },
+  "devDependencies": {
+    "@pascca/config": "workspace:*",
+    "@pascca/types": "workspace:*",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.8"
+  }
+}

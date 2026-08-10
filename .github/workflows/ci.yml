@@ -1,0 +1,77 @@
+name: CI
+
+# FR-010: lint, typecheck, test, and build are reported INDEPENDENTLY on every PR — an
+# `if: '!cancelled()'` guard on each step means one failure doesn't hide the others behind it
+# (research R8). No migration step exists in this file, anywhere (FR-012, Article 32 [NN],
+# spec edge case) — migrations live only in migrate.yml, which nothing here triggers.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality (lint · typecheck · test · build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Article 5 [NN]: Node 22 LTS, sourced from the same .nvmrc a developer uses locally —
+          # one pin, not a CI-only duplicate that could drift from it.
+          node-version-file: .nvmrc
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: package.json # resolves the pinned version from "packageManager"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-store-${{ runner.os }}-
+
+      - name: Restore Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Each step below runs even if an earlier one failed (!cancelled()), so a lint error
+      # doesn't hide a typecheck error — FR-010's "reported individually" requirement.
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: pnpm lint
+
+      - name: Typecheck
+        if: ${{ !cancelled() }}
+        run: pnpm typecheck
+
+      - name: Test
+        if: ${{ !cancelled() }}
+        run: pnpm test
+
+      - name: Build
+        if: ${{ !cancelled() }}
+        run: pnpm build
