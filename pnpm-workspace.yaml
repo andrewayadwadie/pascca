@@ -5,3 +5,7 @@ engineStrict: true
 allowBuilds:
   esbuild: true
   sharp: true
+  argon2: true
+  "@prisma/client": true
+  prisma: true
+  "@prisma/engines": true

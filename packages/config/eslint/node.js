@@ -26,4 +26,15 @@ export default [
       "no-restricted-properties": "off",
     },
   },
+  {
+    // Standalone dev-time scripts and test infrastructure outside the request path — Article 8's
+    // "one file" rule governs the running API, not `tsx prisma/seed.ts` or the test harness.
+    // Both need process.env before (or without) the full request-time schema in env.ts: the seed
+    // script reads one optional password var (T029), and tests/helpers/db.ts must fail loudly on
+    // a missing DATABASE_URL even when the rest of env.ts's schema isn't satisfiable (T008).
+    files: ["prisma/seed.ts", "prisma/seed/**/*.ts", "tests/helpers/db.ts"],
+    rules: {
+      "no-restricted-properties": "off",
+    },
+  },
 ];

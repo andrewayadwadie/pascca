@@ -4,6 +4,12 @@ name: CI
 # `if: '!cancelled()'` guard on each step means one failure doesn't hide the others behind it
 # (research R8). No migration step exists in this file, anywhere (FR-012, Article 32 [NN],
 # spec edge case) — migrations live only in migrate.yml, which nothing here triggers.
+#
+# 002-content-schema-seed (research R13, T006): added the `postgres` service container below,
+# for the Test step ONLY. Layers 2 and 3 of this feature's tests (migration + seed) need a live
+# database and would otherwise never run in CI. Nothing here applies a migration — the Test step
+# runs `prisma migrate dev` itself, the same as a developer would locally, against this
+# ephemeral, throwaway database. Still no automatic production migration (Article 32 [NN]).
 
 on:
   pull_request:
@@ -18,6 +24,20 @@ jobs:
   quality:
     name: Quality (lint · typecheck · test · build)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pascca
+          POSTGRES_PASSWORD: pascca
+          POSTGRES_DB: pascca
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pascca -d pascca"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,6 +90,10 @@ jobs:
 
       - name: Test
         if: ${{ !cancelled() }}
+        env:
+          # Test-step only, as R13/T006 require. This never reaches migrate.yml or a real
+          # environment — it is the ephemeral `services.postgres` container above.
+          DATABASE_URL: postgresql://pascca:pascca@localhost:5432/pascca
         run: pnpm test
 
       - name: Build

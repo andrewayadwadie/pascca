@@ -1,10 +1,14 @@
-// Article 11: build the phase in front of you. This file exists to make `prisma generate` and
-// the boot-time connectivity check work — nothing more. ZERO models ship in this feature; the
-// first entity feature (Article 12, Tier 1) adds the first one.
+// 002-content-schema-seed: the first models in this repo (Article 11 — feature 001 shipped this
+// file deliberately empty). Design rationale lives in specs/002-content-schema-seed/data-model.md
+// and research.md; this file is the source of truth once the two disagree (Article 8 [NN]).
 //
-// Article 11's forward-looking obligation ("designed so Phase 9 ordering can be added without
-// altering existing tables") is trivially satisfied with zero tables and passes forward
-// untouched to whichever feature adds the first model.
+// Two rules that apply to every model below, stated once here rather than repeated per field:
+//   - Bilingual pairs (`nameEn`/`nameAr`) are for content Pascca WRITES for visitors. Data a
+//     guest or staff member ENTERS about one transaction (a name, a phone number, a note) stays
+//     a single column — never `customerNameEn`. Article 21 [NN], data-model.md.
+//   - Every price is `Int`, in piastres (1/100 EGP). No `Decimal`, no `Float`, no exceptions.
+//
+// `onDelete` is set explicitly on every relation (T020) — never left on Prisma's default.
 
 generator client {
   provider = "prisma-client-js"
@@ -13,4 +17,588 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------------------------
+// Enums (T012)
+// ---------------------------------------------------------------------------------------------
+
+enum Role {
+  ADMIN
+  MODERATOR
+  CUSTOMER
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  SEATED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum ReservationSource {
+  WEBSITE
+  PHONE
+  WALK_IN
+  DASHBOARD
+  MOBILE_APP // Phase 8 needs no enum change later — free to add now, an alteration to add later.
+}
+
+enum ReservationOccasion {
+  NONE
+  BIRTHDAY
+  ENGAGEMENT
+  ANNIVERSARY
+  FAMILY
+  BUSINESS
+  OTHER
+}
+
+enum TestimonialSource {
+  GOOGLE
+  TRIPADVISOR
+  INSTAGRAM
+  RESTAURANT_GURU
+  DIRECT
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum MessageStatus {
+  NEW
+  READ
+  HANDLED
+  ARCHIVED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+}
+
+// ---------------------------------------------------------------------------------------------
+// Domain 1 — Identity (T013)
+// ---------------------------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  phone         String?
+  role          Role      @default(CUSTOMER)
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  refreshTokens        RefreshToken[]
+  handledReservations  Reservation[]
+  reservationEvents    ReservationEvent[]
+  posts                Post[]
+  handledContactMessages ContactMessage[]
+  auditLogs            AuditLog[]
+}
+
+// Tier 1 (audit-adjacent). Seeded EMPTY (FR-014) — populated only by real logins.
+model RefreshToken {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash            String    @unique
+  familyId             String
+  expiresAt            DateTime
+  revokedAt            DateTime?
+  replacedByTokenHash  String?
+  userAgent            String?
+  ip                   String?
+  createdAt            DateTime  @default(now()) // append-only: no updatedAt, no deletedAt
+
+  @@index([userId])
+  @@index([familyId])
+  @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------------------------
+// Domain 2 — Branches (T014)
+// ---------------------------------------------------------------------------------------------
+
+model Branch {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  nameEn        String
+  nameAr        String?
+  addressEn     String
+  addressAr     String?
+  descriptionEn String?
+  descriptionAr String?
+  phone         String
+  whatsapp      String? // Article 27 [NN]: stored, but no user-facing copy may promise it yet.
+  email         String?
+  latitude      Float
+  longitude     Float
+  mapUrl        String?
+  seatCapacity  Int
+  isActive      Boolean   @default(true)
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  hours             BranchHour[]
+  closures          BranchClosure[]
+  tables            DiningTable[]
+  menuItemBranches  MenuItemBranch[]
+  reservations      Reservation[]
+  galleryImages     GalleryImage[]
+  testimonials      Testimonial[]
+  teamMembers       TeamMember[]
+}
+
+// Opening hours per day of week — the midnight-crossing model (research R3). Never assume
+// `closesAt > opensAt`: Shobra's Monday row has `closesAt (120) < opensAt (720)`.
+model BranchHour {
+  id             String    @id @default(cuid())
+  branchId       String
+  branch         Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  dayOfWeek      Int // 0 = Sunday … 6 = Saturday
+  opensAt        Int // minutes past midnight, 0–1439 — no timezone, a wall-clock fact
+  closesAt       Int // same encoding; may be LESS than opensAt when closesNextDay is true
+  closesNextDay  Boolean   @default(false)
+  isOpen24h      Boolean   @default(false)
+  isClosed       Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@unique([branchId, dayOfWeek])
+}
+
+// Dated exception overriding normal hours. NOT seeded (spec Assumptions) — operational data,
+// entered through the dashboard.
+model BranchClosure {
+  id         String    @id @default(cuid())
+  branchId   String
+  branch     Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  startsAt   DateTime
+  endsAt     DateTime
+  reasonEn   String?
+  reasonAr   String?
+  isFullDay  Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  @@index([branchId, startsAt])
+}
+
+// Article 26 [NN]: capacity feeds availability; auto-assignment is out of scope.
+model DiningTable {
+  id         String    @id @default(cuid())
+  branchId   String
+  branch     Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  code       String // "T1", "TERRACE-2" — operator-facing identifier
+  labelEn    String?
+  labelAr    String?
+  seats      Int
+  isActive   Boolean   @default(true)
+  sortOrder  Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  reservations Reservation[]
+
+  @@unique([branchId, code])
+}
+
+// ---------------------------------------------------------------------------------------------
+// Domain 3 — Menu (T015)
+// ---------------------------------------------------------------------------------------------
+
+model Category {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  nameEn         String
+  nameAr         String?
+  descriptionEn  String?
+  descriptionAr  String?
+  imageUrl       String?
+  imageAltEn     String?
+  imageAltAr     String?
+  sortOrder      Int       @default(0) // Article 18's fixed menu-section order
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  menuItems MenuItem[]
+}
+
+model MenuItem {
+  id             String    @id @default(cuid())
+  categoryId     String
+  category       Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  slug           String    @unique
+  nameEn         String
+  nameAr         String?
+  descriptionEn  String?
+  descriptionAr  String?
+  price          Int // piastres — non-nullable: a priceless dish is unrepresentable (Art 2 [NN])
+  imageUrl       String?
+  imageAltEn     String?
+  imageAltAr     String?
+  isFasting      Boolean   @default(false) // صيامي — indexed (FR-003)
+  isVegetarian   Boolean   @default(false)
+  isSpicy        Boolean   @default(false)
+  isFeatured     Boolean   @default(false) // indexed (FR-003); human-curated, never auto-ranked
+  featuredRank   Int?
+  isAvailable    Boolean   @default(true) // the "86 a dish" toggle (Article 14 [NN])
+  allergens      String[]
+  prepMinutes    Int?
+  sortOrder      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  variants  MenuItemVariant[]
+  branches  MenuItemBranch[]
+
+  @@index([isFasting])
+  @@index([isFeatured])
+  @@index([categoryId, sortOrder])
+}
+
+// Optional size/style variation. Zero-or-more per item, not one-to-one.
+model MenuItemVariant {
+  id          String    @id @default(cuid())
+  menuItemId  String
+  menuItem    MenuItem  @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  nameEn      String // "Large", "Family"
+  nameAr      String?
+  price       Int // piastres — absolute price, not a delta (a delta breaks on a discount)
+  isDefault   Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@unique([menuItemId, nameEn])
+}
+
+// Per-branch price/availability divergence without duplicating the item. `null` fields mean
+// "inherit from MenuItem" — copying the base price into every row would create a second,
+// silently-drifting source of truth (Article 8 [NN]).
+model MenuItemBranch {
+  id           String    @id @default(cuid())
+  menuItemId   String
+  menuItem     MenuItem  @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  branchId     String
+  branch       Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  price        Int? // null = inherit MenuItem.price
+  isAvailable  Boolean? // null = inherit MenuItem.isAvailable
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  @@unique([menuItemId, branchId])
+}
+
+// ---------------------------------------------------------------------------------------------
+// Domain 4 — Reservations (T016)
+// ---------------------------------------------------------------------------------------------
+
+model Reservation {
+  id            String              @id @default(cuid())
+  code          String              @unique // 6-char alphanumeric, guest-shareable (FR-006a)
+  branchId      String
+  branch        Branch              @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  tableId       String?
+  table         DiningTable?        @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  customerName  String // entered data
+  phone         String // entered data — indexed (FR-006); PII retention 12 months (Art 29 [NN])
+  email         String?
+  partySize     Int
+  reservedAt    DateTime
+  durationMin   Int                 @default(90) // Article 26 [NN]
+  status        ReservationStatus   @default(PENDING)
+  source        ReservationSource   @default(WEBSITE)
+  occasion      ReservationOccasion @default(NONE)
+  notes         String? // guest-supplied — entered data
+  staffNotes    String? // internal — never leaves via a public/customer endpoint (Art 15 [NN])
+  requiresCall  Boolean             @default(false) // true when partySize > 6 (Article 26 [NN])
+  handledById   String?
+  handledBy     User?               @relation(fields: [handledById], references: [id], onDelete: SetNull)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  deletedAt     DateTime?
+
+  events ReservationEvent[]
+
+  // All three required verbatim by FR-006. [branchId, reservedAt] is exactly the access path
+  // Article 25's seat-overlap query needs.
+  @@index([branchId, reservedAt])
+  @@index([status, reservedAt])
+  @@index([phone])
+}
+
+// Append-only. Article 15 [NN]: every reservation status change writes one.
+model ReservationEvent {
+  id             String             @id @default(cuid())
+  reservationId  String
+  reservation    Reservation        @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  fromStatus     ReservationStatus?
+  toStatus       ReservationStatus
+  actorId        String?
+  actor          User?              @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  note           String? // internal — entered data, never bilingual
+  createdAt      DateTime           @default(now()) // no updatedAt, no deletedAt — history
+
+  @@index([reservationId, createdAt])
+}
+
+// ---------------------------------------------------------------------------------------------
+// Domain 5 — Marketing content (T017)
+// ---------------------------------------------------------------------------------------------
+
+// Article 13 [NN]: four albums — The food, The rooms, Breakfast, Occasions.
+model GalleryAlbum {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  titleEn        String
+  titleAr        String?
+  descriptionEn  String?
+  descriptionAr  String?
+  coverImageUrl  String?
+  sortOrder      Int       @default(0)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  images GalleryImage[]
+}
+
+model GalleryImage {
+  id          String    @id @default(cuid())
+  albumId     String
+  album       GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  branchId    String?
+  branch      Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  url         String    @unique // no other natural key exists; the seed's deterministic per-image
+    // URL doubles as its upsert key (research R6's pattern applied to an entity R6 didn't name)
+  blurHash    String?
+  width       Int?
+  height      Int? // explicit dimensions, zero CLS (Article 20 [NN])
+  altEn       String // required — Article 20 [NN]. "" is a deliberate decorative choice.
+  altAr       String?
+  captionEn   String?
+  captionAr   String?
+  sortOrder   Int       @default(0) // Article 13's drag-ordering
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([albumId, sortOrder])
+}
+
+// Article 13 [NN]: manual entry only — never scraped, never pulled live from Google.
+model Testimonial {
+  id            String              @id @default(cuid())
+  author        String // a real person's name — entered data
+  source        TestimonialSource
+  rating        Int?
+  quoteEn       String
+  quoteAr       String?
+  branchId      String?
+  branch        Branch?             @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  consentGiven  Boolean             @default(false) // false must be unpublishable (API-enforced)
+  publishedAt   DateTime?
+  sortOrder     Int                 @default(0)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  deletedAt     DateTime?
+
+  @@index([publishedAt])
+}
+
+model FaqItem {
+  id          String    @id @default(cuid())
+  questionEn  String
+  questionAr  String?
+  answerEn    String
+  answerAr    String?
+  category    String? // general vs. booking — Article 18 puts FAQ blocks on / and /reservations
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+}
+
+model TeamMember {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  nameEn      String // a name genuinely is transliterated here, unlike a guest's own name
+  nameAr      String?
+  roleEn      String
+  roleAr      String?
+  bioEn       String?
+  bioAr       String?
+  photoUrl    String?
+  photoAltEn  String?
+  photoAltAr  String?
+  branchId    String?
+  branch      Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+}
+
+model Milestone {
+  id             String    @id @default(cuid())
+  year           Int
+  month          Int?
+  titleEn        String
+  titleAr        String?
+  descriptionEn  String?
+  descriptionAr  String?
+  imageUrl       String?
+  sortOrder      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([year])
+}
+
+// Article 24: modelled and CRUD-able from day one; nothing reads it publicly (FR-007).
+model Post {
+  id             String     @id @default(cuid())
+  slugEn         String     @unique
+  slugAr         String?    @unique // an Arabic article gets its own URL segment
+  titleEn        String
+  titleAr        String?
+  excerptEn      String?
+  excerptAr      String?
+  bodyEn         String
+  bodyAr         String?
+  coverImageUrl  String?
+  coverAltEn     String?
+  coverAltAr     String?
+  status         PostStatus @default(DRAFT)
+  publishedAt    DateTime?
+  authorId       String?
+  author         User?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+
+  @@index([status, publishedAt])
+}
+
+// ---------------------------------------------------------------------------------------------
+// Domain 6 — Tier 2 page copy (T018)
+// ---------------------------------------------------------------------------------------------
+
+// Keyed (page, block) with a typed JSON value — clarification 2026-08-10, plan.md gate 12.
+// `value` keys: headlineEn/Ar, eyebrowEn/Ar, subEn/Ar, ctaLabelEn/Ar, ctaHref (not bilingual —
+// a route/URL is locale-agnostic; the /[locale]/ prefix is applied at render time).
+model PageBlock {
+  id         String    @id @default(cuid())
+  page       String // home, menu, about, gallery, branches, reservations, contact, legal
+  block      String // named section within that page ("hero", "signature-dishes", ...)
+  value      Json
+  ctaHref    String?
+  sortOrder  Int       @default(0)
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  @@unique([page, block])
+  @@index([page, sortOrder])
+}
+
+// Model 23 — SEO is per-page (Article 12), not per-block; hanging it off PageBlock would
+// duplicate it across every block or strand it on one arbitrary "primary" block.
+model PageSeo {
+  id             String    @id @default(cuid())
+  page           String    @unique
+  titleEn        String
+  titleAr        String?
+  descriptionEn  String?
+  descriptionAr  String?
+  ogImageUrl     String?
+  ogImageAltEn   String?
+  ogImageAltAr   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+}
+
+// ---------------------------------------------------------------------------------------------
+// Domain 7 — Operations (T019)
+// ---------------------------------------------------------------------------------------------
+
+model ContactMessage {
+  id           String        @id @default(cuid())
+  name         String
+  email        String
+  phone        String?
+  subject      String?
+  message      String
+  status       MessageStatus @default(NEW)
+  handledById  String?
+  handledBy    User?         @relation(fields: [handledById], references: [id], onDelete: SetNull)
+  handledAt    DateTime?
+  ip           String? // rate-limit forensics (Article 29 [NN])
+  userAgent    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  @@index([status, createdAt])
+}
+
+// Article 23: delivery links live here so they can be swapped/removed the day own-ordering
+// launches. `value` is Json — a boolean flag stays a boolean, a URL stays a string. Kept
+// deliberately String (not Json) as the trap named in contracts/phase-9-additive-review.md.
+model SiteSetting {
+  id         String    @id @default(cuid())
+  key        String    @unique
+  value      Json
+  group      String? // dashboard grouping
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+}
+
+// Append-only. Article 15 [NN]. Seeded EMPTY (FR-014). `entity`/`entityId` stay plain String —
+// not a typed relation — specifically so any future entity (Phase 9 included) can be audited
+// without altering this table (contracts/phase-9-additive-review.md).
+model AuditLog {
+  id         String       @id @default(cuid())
+  actorId    String?
+  actor      User?        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     AuditAction
+  entity     String // model name
+  entityId   String
+  diff       Json // before/after — never leaves via a public or customer endpoint (Art 15 [NN])
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime     @default(now()) // no updatedAt, no deletedAt
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
 }
