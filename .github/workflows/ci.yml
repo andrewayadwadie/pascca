@@ -2,14 +2,17 @@ name: CI
 
 # FR-010: lint, typecheck, test, and build are reported INDEPENDENTLY on every PR — an
 # `if: '!cancelled()'` guard on each step means one failure doesn't hide the others behind it
-# (research R8). No migration step exists in this file, anywhere (FR-012, Article 32 [NN],
-# spec edge case) — migrations live only in migrate.yml, which nothing here triggers.
+# (research R8). No PRODUCTION migration step exists in this file, anywhere (FR-012, Article 32
+# [NN], spec edge case) — a real environment is migrated only by migrate.yml, which nothing here
+# triggers.
 #
 # 002-content-schema-seed (research R13, T006): added the `postgres` service container below,
-# for the Test step ONLY. Layers 2 and 3 of this feature's tests (migration + seed) need a live
-# database and would otherwise never run in CI. Nothing here applies a migration — the Test step
-# runs `prisma migrate dev` itself, the same as a developer would locally, against this
-# ephemeral, throwaway database. Still no automatic production migration (Article 32 [NN]).
+# plus the "Generate Prisma client" and "Migrate test database" steps. Layers 2 and 3 of this
+# feature's tests (migration + seed) need a live, migrated database and a generated client, and
+# would otherwise never run in CI. "Migrate test database" runs `prisma migrate deploy` — applies
+# the already-committed migration file, generates nothing (contracts/db-commands.md: "CI never
+# generates migrations") — against this ephemeral, throwaway container. Still no automatic
+# production migration (Article 32 [NN]): that database is never reachable from this job.
 
 on:
   pull_request:
@@ -78,6 +81,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Typecheck and Test both import generated Prisma Client types/runtime
+      # (`@prisma/client`); neither exists until this runs. `prisma generate` reads only
+      # schema.prisma — no DB contact — but Prisma still resolves `env("DATABASE_URL")` while
+      # validating the schema, so the var must be present even here.
+      - name: Generate Prisma client
+        if: ${{ !cancelled() }}
+        env:
+          DATABASE_URL: postgresql://pascca:pascca@localhost:5432/pascca
+        run: pnpm --filter @pascca/api db:generate
+
       # Each step below runs even if an earlier one failed (!cancelled()), so a lint error
       # doesn't hide a typecheck error — FR-010's "reported individually" requirement.
       - name: Lint
@@ -87,6 +100,15 @@ jobs:
       - name: Typecheck
         if: ${{ !cancelled() }}
         run: pnpm typecheck
+
+      # `migrate deploy`, not `migrate dev` — applies the committed migration file as-is and
+      # never generates a new one (contracts/db-commands.md). Same command migrate.yml uses
+      # against production; here it targets only the ephemeral `services.postgres` above.
+      - name: Migrate test database
+        if: ${{ !cancelled() }}
+        env:
+          DATABASE_URL: postgresql://pascca:pascca@localhost:5432/pascca
+        run: pnpm --filter @pascca/api exec prisma migrate deploy
 
       - name: Test
         if: ${{ !cancelled() }}
