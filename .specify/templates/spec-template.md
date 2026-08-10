@@ -104,14 +104,14 @@ each, or `N/A` with a reason — do not delete the rows.
   [which fields, or N/A]
 - **AR-002** (Art 4): Every capability is exposed as a `/api/v1` endpoint a mobile client could
   call — [which endpoints]
-- **AR-003** (Art 14/23): Every user-facing string exists in `ar` and `en`; the Arabic RTL layout
+- **AR-003** (Art 21): Every user-facing string exists in `ar` and `en`; the Arabic RTL layout
   is a first-class case, not a follow-up — [which surfaces]
-- **AR-004** (Art 9): Failure modes and their permanent error codes — [e.g. `RES_SLOT_UNAVAILABLE`]
-- **AR-005** (Art 10): Who may do this, per role, and what an unauthorised user sees (nothing
+- **AR-004** (Art 10): Failure modes and their permanent error codes — [e.g. `RES_SLOT_UNAVAILABLE`]
+- **AR-005** (Art 14): Who may do this, per role, and what an unauthorised user sees (nothing
   rendered — not a disabled control) — [ADMIN / MODERATOR / CUSTOMER / public]
-- **AR-006** (Art 12): Mutations that need soft delete, an `AuditLog` diff, or a
+- **AR-006** (Art 15): Mutations that need soft delete, an `AuditLog` diff, or a
   `ReservationEvent` — [which, or N/A]
-- **AR-007** (Art 24): Accessibility obligations this feature introduces (labels, `aria-label`,
+- **AR-007** (Art 28): Accessibility obligations this feature introduces (labels, `aria-label`,
   focus order, screen-reader announcements, contrast) — [which]
 
 ### Key Entities *(include if feature involves data)*

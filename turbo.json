@@ -18,7 +18,12 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "outputs": ["coverage/**"],
+      // Turbo 2's default env mode is strict — an unlisted var is invisible to the task even
+      // though the shell that invoked `turbo` has it. apps/api's database-backed suites
+      // (002-content-schema-seed) need DATABASE_URL; listing it here also puts it in the task's
+      // cache key, so a changed DB URL correctly busts the cache instead of serving a stale pass.
+      "env": ["DATABASE_URL"]
     }
   }
 }

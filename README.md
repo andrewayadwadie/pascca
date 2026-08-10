@@ -15,13 +15,16 @@ restaurant with two Cairo branches. One backend, API-first — see
 ## Getting started
 
 Full walkthrough, including how to verify each piece actually works, lives in
-[`specs/001-monorepo-scaffold/quickstart.md`](specs/001-monorepo-scaffold/quickstart.md).
-Short version:
+[`specs/001-monorepo-scaffold/quickstart.md`](specs/001-monorepo-scaffold/quickstart.md) (repo
+setup) and [`specs/002-content-schema-seed/quickstart.md`](specs/002-content-schema-seed/quickstart.md)
+(database schema + seed data). Short version:
 
 ```bash
 pnpm install
 cp .env.example .env   # fill in real local values
 docker compose up -d   # postgres · redis · minio
+pnpm db:migrate         # apply the schema
+pnpm db:seed            # fill it with a working Pascca
 pnpm dev                # api :3001 · web :3000 · admin :5173
 ```
 

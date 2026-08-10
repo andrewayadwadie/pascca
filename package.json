@@ -10,7 +10,12 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "db:generate": "pnpm --filter @pascca/api db:generate",
+    "db:migrate": "pnpm --filter @pascca/api db:migrate",
+    "db:seed": "pnpm --filter @pascca/api db:seed",
+    "db:reset": "pnpm --filter @pascca/api db:reset",
+    "db:studio": "pnpm --filter @pascca/api db:studio"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
