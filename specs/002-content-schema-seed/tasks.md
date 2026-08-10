@@ -176,7 +176,7 @@ unchanged.
 - [X] T048 [P] Update `README.md`'s "Getting started" block to include `pnpm db:migrate` and `pnpm db:seed` after `docker compose up -d`, and point at `specs/002-content-schema-seed/quickstart.md`
 - [X] T049 Resolve the `TODO(client-data)` markers in `apps/api/prisma/seed/branches.ts`: either replace the placeholder addresses, phones, and coordinates with client-supplied values, **or** leave the markers in place and state plainly in the PR description that this data is unverified placeholder content. Do not present placeholders as fact (plan.md gate 33)
 - [X] T050 Run the full definition-of-done gate: `pnpm lint && pnpm typecheck && pnpm test && pnpm build` green, plus `pnpm db:reset` (drop → migrate → seed) succeeding from scratch (Art 31)
-- [ ] T051 Push the branch, open a PR, and confirm CI is **actually green** on GitHub — including the new `postgres:16` service container running the migration, seed, and idempotency tests. A local pass is not evidence the CI change works (feature 001 learned this the expensive way: a lint failure invisible locally broke real CI)
+- [X] T051 Push the branch, open a PR, and confirm CI is **actually green** on GitHub — including the new `postgres:16` service container running the migration, seed, and idempotency tests. A local pass is not evidence the CI change works (feature 001 learned this the expensive way: a lint failure invisible locally broke real CI)
 
 ---
 
