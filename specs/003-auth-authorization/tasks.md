@@ -351,7 +351,7 @@ actions are authenticated-only, not permission-gated.
       migration/seed step and link `specs/003-auth-authorization/quickstart.md`
 - [X] T070 Run the full Definition-of-Done gate: `pnpm lint && pnpm typecheck && pnpm test &&
       pnpm build` green (Art 31)
-- [ ] T071 Push the branch, open a PR, and confirm CI is **actually green** on GitHub — including
+- [X] T071 Push the branch, open a PR, and confirm CI is **actually green** on GitHub — including
       the new plugins, the `RolePermission` migration, and the full test suite (feature 001/002
       precedent: a local pass is not evidence)
 
