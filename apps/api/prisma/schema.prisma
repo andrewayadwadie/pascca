@@ -602,3 +602,23 @@ model AuditLog {
   @@index([entity, entityId])
   @@index([actorId, createdAt])
 }
+
+// ---------------------------------------------------------------------------------------------
+// 003-auth-authorization — the seeded role→permission map Article 14 [NN] requires.
+// ---------------------------------------------------------------------------------------------
+
+// The ONLY way to add a role's capability or grant a new permission is a seed edit
+// (prisma/seed/permissions.ts) — never a code path that compares `role` directly (data-model.md,
+// research R5). One row per granted (role, permission) pair; no separate `Permission` entity —
+// a permission is a string a route decorates itself with, nothing more, until a real need for
+// per-permission metadata appears. Append-only: no updatedAt, no deletedAt — a grant is removed
+// by deleting the row on re-seed, not by soft delete.
+model RolePermission {
+  id         String   @id @default(cuid())
+  role       Role
+  permission String
+  createdAt  DateTime @default(now())
+
+  @@unique([role, permission])
+  @@index([role])
+}

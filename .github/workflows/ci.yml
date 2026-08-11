@@ -13,6 +13,15 @@ name: CI
 # the already-committed migration file, generates nothing (contracts/db-commands.md: "CI never
 # generates migrations") — against this ephemeral, throwaway container. Still no automatic
 # production migration (Article 32 [NN]): that database is never reachable from this job.
+#
+# 003-auth-authorization: added the `redis` service container. The HTTP-level auth/permissions
+# suites build a real app (`buildApp(loadEnv())`), which needs env.ts's FULL schema satisfied,
+# not just DATABASE_URL — REDIS_URL for real rate-limit tests (the shared 5/min/IP budget is
+# genuinely exercised, not just present-but-unused), the two auth secrets, and S3_*/CORS_ORIGINS
+# purely to satisfy Zod (nothing in `buildApp()` itself contacts S3 — `lib/health.ts`'s boot
+# check is a separate code path this test suite never calls). None of these values are secrets
+# worth protecting — they're throwaway, ephemeral-container credentials, same posture as the
+# Postgres ones above.
 
 on:
   pull_request:
@@ -38,6 +47,15 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd "pg_isready -U pascca -d pascca"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -114,8 +132,19 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           # Test-step only, as R13/T006 require. This never reaches migrate.yml or a real
-          # environment — it is the ephemeral `services.postgres` container above.
+          # environment — it is the ephemeral `services.postgres`/`services.redis` above.
           DATABASE_URL: postgresql://pascca:pascca@localhost:5432/pascca
+          REDIS_URL: redis://localhost:6379
+          # 003-auth-authorization: satisfies env.ts's schema for buildApp()-based tests. Not
+          # real secrets — throwaway values scoped to this ephemeral job.
+          JWT_ACCESS_SECRET: ci-only-jwt-access-secret-not-a-real-secret-32chars
+          COOKIE_SECRET: ci-only-cookie-secret-not-a-real-secret-32-characters
+          S3_ENDPOINT: http://localhost:9000
+          S3_REGION: auto
+          S3_ACCESS_KEY_ID: ci-placeholder
+          S3_SECRET_ACCESS_KEY: ci-placeholder
+          S3_BUCKET: ci-placeholder
+          CORS_ORIGINS: http://localhost:3000
         run: pnpm test
 
       - name: Build

@@ -14,6 +14,7 @@ const apiRoot = path.resolve(import.meta.dirname, "..");
 const expectedModels = [
   "User",
   "RefreshToken",
+  "RolePermission", // 003-auth-authorization — the seeded role→permission map (Art 14 [NN])
   "Branch",
   "BranchHour",
   "BranchClosure",
@@ -53,7 +54,7 @@ afterAll(async () => {
   await disconnect();
 });
 
-describe("migration: all 24 tables exist after a clean deploy", () => {
+describe("migration: all 25 tables exist after a clean deploy", () => {
   it("creates every expected application table plus Prisma's own migrations table", async () => {
     const rows = await prisma.$queryRaw<Array<{ tablename: string }>>`
       SELECT tablename FROM pg_tables WHERE schemaname = 'public'

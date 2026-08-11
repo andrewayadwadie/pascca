@@ -48,6 +48,12 @@ export const schema = z.object({
     .refine((origins) => !origins.includes("*"), {
       message: "Wildcard '*' is not permitted (Article 29 [NN]) — list explicit origins",
     }),
+
+  // 003-auth-authorization: signing secrets for the two things a leaked env var would let an
+  // attacker forge — access tokens and the refresh-token cookie. `min(32)` is a floor against an
+  // obviously-weak value, not a guarantee of quality; no default, ever (Article 29 [NN]).
+  JWT_ACCESS_SECRET: z.string().min(32),
+  COOKIE_SECRET: z.string().min(32),
 });
 
 export type Env = z.infer<typeof schema>;

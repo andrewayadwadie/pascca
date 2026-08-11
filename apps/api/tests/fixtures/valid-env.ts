@@ -13,4 +13,8 @@ export const VALID_ENV: NodeJS.ProcessEnv = {
   S3_SECRET_ACCESS_KEY: "secret",
   S3_BUCKET: "bucket",
   CORS_ORIGINS: "http://localhost:3000",
+  // 003-auth-authorization: JWT access-token + refresh-cookie signing secrets. Test-only
+  // values — never real secrets (Article 29 [NN]).
+  JWT_ACCESS_SECRET: "test-jwt-access-secret-32-characters-minimum",
+  COOKIE_SECRET: "test-cookie-secret-32-characters-minimum-ok",
 };

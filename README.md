@@ -16,15 +16,16 @@ restaurant with two Cairo branches. One backend, API-first — see
 
 Full walkthrough, including how to verify each piece actually works, lives in
 [`specs/001-monorepo-scaffold/quickstart.md`](specs/001-monorepo-scaffold/quickstart.md) (repo
-setup) and [`specs/002-content-schema-seed/quickstart.md`](specs/002-content-schema-seed/quickstart.md)
-(database schema + seed data). Short version:
+setup), [`specs/002-content-schema-seed/quickstart.md`](specs/002-content-schema-seed/quickstart.md)
+(database schema + seed data), and [`specs/003-auth-authorization/quickstart.md`](specs/003-auth-authorization/quickstart.md)
+(auth flow, permission matrix). Short version:
 
 ```bash
 pnpm install
-cp .env.example .env   # fill in real local values
+cp .env.example .env   # fill in real local values, incl. JWT_ACCESS_SECRET/COOKIE_SECRET
 docker compose up -d   # postgres · redis · minio
-pnpm db:migrate         # apply the schema
-pnpm db:seed            # fill it with a working Pascca
+pnpm db:migrate         # apply the schema (incl. the seeded role→permission map)
+pnpm db:seed            # fill it with a working Pascca + the two staff accounts
 pnpm dev                # api :3001 · web :3000 · admin :5173
 ```
 
