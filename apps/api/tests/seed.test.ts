@@ -64,10 +64,15 @@ describe("seed: exact counts fixed by FR-010/FR-014", () => {
 });
 
 describe("seed: approximate counts (ranges, not exact — contracts/seed-dataset.md)", () => {
-  it("seeds roughly forty menu items", async () => {
+  // 004-web-design-system-port (research R7/R8, T107): the menu now imports from
+  // files/site/menu.html's real dish list via @pascca/web/content/menu, replacing 002's
+  // independently-invented ~forty-item placeholder menu. files/site's real count is 31 (6
+  // pizza + 3 calzone + 5 pasta + 3 mains + 4 starters + 4 breakfast + 3 desserts + 3 drinks) —
+  // this range is widened around that real, verified number, not padded back toward "forty".
+  it("seeds roughly thirty menu items", async () => {
     const count = await prisma.menuItem.count();
-    expect(count).toBeGreaterThanOrEqual(35);
-    expect(count).toBeLessThanOrEqual(50);
+    expect(count).toBeGreaterThanOrEqual(25);
+    expect(count).toBeLessThanOrEqual(40);
   });
 
   it("seeds at least one PageBlock per page (site renders before the dashboard is touched)", async () => {

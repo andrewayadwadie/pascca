@@ -1,8 +1,10 @@
 // 003-auth-authorization (T015, Art 8 [NN], research R9). Reads the static OpenAPI document
 // `apps/api/scripts/export-openapi.ts` writes to `docs/openapi.json` and generates
 // `src/index.ts` from it via `openapi-typescript`'s programmatic API — no live server required,
-// so this runs the same way locally and in CI. Nothing under `src/` is ever hand-written; this
-// script is the only thing that touches it.
+// so this runs the same way locally and in CI. Nothing under `src/index.ts` is ever hand-written;
+// this script is the only thing that touches it. `src/content/` is a deliberate, permanent
+// exception — hand-written content DTOs with their own package export (research R6,
+// 004-web-design-system-port) — this script does not generate and must never overwrite it.
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import openapiTS, { astToString } from "openapi-typescript";

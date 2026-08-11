@@ -46,8 +46,14 @@ export async function runSeed(prisma: PrismaClient): Promise<SeedCounts> {
   await seedSiteSettings(prisma);
   const users = await seedUsers(prisma);
   const branches = await seedBranches(prisma);
-  await seedMenu(prisma, branches);
-  await seedGallery(prisma, branches);
+  // 004-web-design-system-port (research R7/R8): seedMenu no longer takes `branches` — the new
+  // fixture-backed menu has no MenuItemVariant/MenuItemBranch rows to attach to a branch ID
+  // (files/site models neither sizes nor per-branch overrides for any dish).
+  await seedMenu(prisma);
+  // 004-web-design-system-port: no `branches` param — the fixture's GalleryImage has no
+  // per-image branch tag (data-model.md: files/site's masonry grid shows no branch badge on any
+  // image), so there's nothing to attach a branchId to.
+  await seedGallery(prisma);
   await seedMarketing(prisma, branches, users);
   await seedPageContent(prisma);
   await seedReservations(prisma, branches, users);

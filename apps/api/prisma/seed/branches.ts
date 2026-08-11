@@ -1,16 +1,16 @@
-// Seed module: Branch, BranchHour, DiningTable (T030). Branches upserted on `slug`; hours on
-// `[branchId, dayOfWeek]`; tables on `[branchId, code]` (research R6).
+// Seed module: Branch, BranchHour, DiningTable (T030, refactored T106). Branches upserted on
+// `slug`; hours on `[branchId, dayOfWeek]`; tables on `[branchId, code]` (research R6).
 //
-// ⚠️ contracts/seed-dataset.md: the address, phone, and coordinate values below are marked
-// TODO(client-data) — realistic placeholders that make the site demoable, NOT client-supplied
-// facts. They must be replaced with verified values, or the PR description must disclose plainly
-// that this data is unverified, before this branch merges (T049).
-//
-// The *structure* of the hours is not a placeholder — it is given directly by the feature
-// request and is the single most load-bearing subtlety in this schema (research R3): Shobra
-// closes at 02:00, past midnight, so `closesAt (120) < opensAt (720)` is correct, not a bug.
-// Heliopolis is open 24 hours, every day.
+// 004-web-design-system-port (FR-022, research R7/R8): nameEn/addressEn/phone/mapUrl now import
+// from `@pascca/web/content/branches` instead of the independent, already-diverged placeholder
+// copy this module used to hand-write (the old TODO(client-data) Shobra address "26 July
+// Corridor, Shobra, Cairo" is replaced by files/site's real "273 Shobra Street, Cairo"). Only
+// `latitude`/`longitude` (parsed straight out of the fixture's `mapUrl` — a Google Maps
+// "?q=lat,lng" link, so this isn't a second coordinate source, just a derived read) and the
+// operational fields no page ever shows (seatCapacity, per-day hours/table structure) stay
+// seed-local — nothing in `files/site/` models those.
 import type { PrismaClient } from "@prisma/client";
+import { branches as branchContent } from "@pascca/web/content/branches";
 
 export interface SeededBranches {
   shobraId: string;
@@ -20,20 +20,38 @@ export interface SeededBranches {
 
 const DAYS = [0, 1, 2, 3, 4, 5, 6]; // 0 = Sunday … 6 = Saturday — every day, both branches open
 
+function coordsFromMapUrl(mapUrl: string | null): { latitude: number; longitude: number } {
+  const match = mapUrl?.match(/q=(-?[\d.]+),(-?[\d.]+)/);
+  if (!match) throw new Error(`seedBranches: could not parse coordinates from mapUrl "${mapUrl}"`);
+  return { latitude: Number(match[1]), longitude: Number(match[2]) };
+}
+
+function branchBySlug(slug: string) {
+  const branch = branchContent.find((b) => b.slug === slug);
+  if (!branch) throw new Error(`seedBranches: no fixture branch with slug "${slug}"`);
+  return branch;
+}
+
 export async function seedBranches(prisma: PrismaClient): Promise<SeededBranches> {
+  const shobraContent = branchBySlug("shobra");
+  const heliopolisContent = branchBySlug("heliopolis");
+  const shobraCoords = coordsFromMapUrl(shobraContent.mapUrl);
+  const heliopolisCoords = coordsFromMapUrl(heliopolisContent.mapUrl);
+
   const shobra = await prisma.branch.upsert({
     where: { slug: "shobra" },
     update: {},
     create: {
       slug: "shobra",
-      nameEn: "Pascca — Shobra",
-      addressEn: "26 July Corridor, Shobra, Cairo", // TODO(client-data): unverified placeholder
+      nameEn: shobraContent.nameEn,
+      addressEn: shobraContent.addressEn,
       descriptionEn: "Where it all started in 2018 — the original stone oven, still going.",
-      phone: "+20 2 2222 0001", // TODO(client-data): unverified placeholder
+      phone: shobraContent.phone,
       whatsapp: null,
-      email: "shobra@pascca.local", // TODO(client-data): unverified placeholder
-      latitude: 30.0667, // TODO(client-data): district-level, not the exact building
-      longitude: 31.246,
+      email: null,
+      latitude: shobraCoords.latitude,
+      longitude: shobraCoords.longitude,
+      mapUrl: shobraContent.mapUrl,
       seatCapacity: 60,
       sortOrder: 0,
     },
@@ -44,14 +62,15 @@ export async function seedBranches(prisma: PrismaClient): Promise<SeededBranches
     update: {},
     create: {
       slug: "heliopolis",
-      nameEn: "Pascca — Heliopolis",
-      addressEn: "El Nozha Street, Heliopolis, Cairo", // TODO(client-data): unverified placeholder
+      nameEn: heliopolisContent.nameEn,
+      addressEn: heliopolisContent.addressEn,
       descriptionEn: "Open around the clock — because a craving doesn't check the time.",
-      phone: "+20 2 2222 0002", // TODO(client-data): unverified placeholder
+      phone: heliopolisContent.phone,
       whatsapp: null,
-      email: "heliopolis@pascca.local", // TODO(client-data): unverified placeholder
-      latitude: 30.0808, // TODO(client-data): district-level, not the exact building
-      longitude: 31.3231,
+      email: null,
+      latitude: heliopolisCoords.latitude,
+      longitude: heliopolisCoords.longitude,
+      mapUrl: heliopolisContent.mapUrl,
       seatCapacity: 80,
       sortOrder: 1,
     },
@@ -65,7 +84,7 @@ export async function seedBranches(prisma: PrismaClient): Promise<SeededBranches
         branchId: shobra.id,
         dayOfWeek,
         opensAt: 720, // 12:00
-        closesAt: 120, // 02:00 the following day — NOT after opensAt, see module comment
+        closesAt: 120, // 02:00 the following day — NOT after opensAt, matches "12pm — 2am" (FR-022)
         closesNextDay: true,
         isOpen24h: false,
       },

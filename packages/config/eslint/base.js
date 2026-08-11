@@ -9,8 +9,14 @@ import tseslint from "typescript-eslint";
 // .css file, outside what ESLint's JS parser touches, so it needs no explicit exclusion.
 // Exported so eslint/react.js can compose it into its own no-restricted-syntax array — flat
 // config REPLACES a rule's value per matching config, it does not merge arrays across entries.
+// Unanchored (research R3, T010): a bare "#d4af37" literal and a hex literal embedded inside a
+// longer string — e.g. Tailwind bracket syntax "bg-[#d4af37]" — are different string shapes.
+// The original anchored form (`^...$`) only caught the first; this catches both without
+// widening so far that it flags an unrelated string containing a URL fragment ending in
+// something hex-shaped (extremely unlikely for a 3/6-digit run bounded to not extend into more
+// hex digits, per the negative lookahead).
 export const noRawHexColour = {
-  selector: "Literal[value=/^#([0-9a-fA-F]{3}){1,2}$/]",
+  selector: "Literal[value=/#([0-9a-fA-F]{3}){1,2}(?![0-9a-fA-F])/]",
   message: "Raw hex colour literal. Colours come from packages/config/tokens.css only (Article 16 [NN]).",
 };
 

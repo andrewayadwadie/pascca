@@ -1,4 +1,25 @@
 /* Article 16 [NN]: this file defines NO colour, radius, spacing, or motion value of its own —
    same rule as apps/web/src/styles/globals.css. Every design value comes from the single
-   shared source. */
+   shared source. Tailwind v4 theme wiring only (research R2) — apps/admin has zero screens
+   this feature (Out of Scope: "Do not build the admin dashboard"), so nothing here is consumed
+   by a component yet; "both apps consume one file" is satisfied by this plumbing existing. */
+@import "tailwindcss";
 @import "@pascca/config/tokens.css";
+
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-gold: var(--gold);
+  --color-gold-2: var(--gold-2);
+  --color-w: var(--w);
+
+  --radius-sm: var(--r-sm);
+  --radius-DEFAULT: var(--r);
+  --radius-lg: var(--r-lg);
+  --radius-pill: var(--pill);
+
+  --ease-spring: var(--spring);
+  --ease-base: var(--ease);
+}

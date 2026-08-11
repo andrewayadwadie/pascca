@@ -17,8 +17,10 @@ restaurant with two Cairo branches. One backend, API-first — see
 Full walkthrough, including how to verify each piece actually works, lives in
 [`specs/001-monorepo-scaffold/quickstart.md`](specs/001-monorepo-scaffold/quickstart.md) (repo
 setup), [`specs/002-content-schema-seed/quickstart.md`](specs/002-content-schema-seed/quickstart.md)
-(database schema + seed data), and [`specs/003-auth-authorization/quickstart.md`](specs/003-auth-authorization/quickstart.md)
-(auth flow, permission matrix). Short version:
+(database schema + seed data), [`specs/003-auth-authorization/quickstart.md`](specs/003-auth-authorization/quickstart.md)
+(auth flow, permission matrix), and
+[`specs/004-web-design-system-port/quickstart.md`](specs/004-web-design-system-port/quickstart.md)
+(the public website — design tokens, content fixtures, a11y/Lighthouse checks). Short version:
 
 ```bash
 pnpm install

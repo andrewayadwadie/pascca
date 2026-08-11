@@ -27,6 +27,12 @@ dist/
 coverage/
 *.tsbuildinfo
 
+# Playwright (004-web-design-system-port)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 
 # Portable Node 22 for local dev (Node mismatch workaround)
 .tools/

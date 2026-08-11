@@ -119,6 +119,13 @@ jobs:
         if: ${{ !cancelled() }}
         run: pnpm typecheck
 
+      # 004-web-design-system-port (FR-005, research R3): catches a raw hex/rgba/px-radius/
+      # cubic-bezier literal outside packages/config/tokens.css — including in .css files,
+      # which the ESLint step above never parses.
+      - name: Check hex literals
+        if: ${{ !cancelled() }}
+        run: node scripts/check-hex-literals.mjs apps/web apps/admin
+
       # `migrate deploy`, not `migrate dev` — applies the committed migration file as-is and
       # never generates a new one (contracts/db-commands.md). Same command migrate.yml uses
       # against production; here it targets only the ephemeral `services.postgres` above.
@@ -150,3 +157,27 @@ jobs:
       - name: Build
         if: ${{ !cancelled() }}
         run: pnpm build
+
+      # 004-web-design-system-port (T105, Article 30's a11y risk row, SC-005/SC-006): a11y and
+      # Lighthouse audits need a real running production build, not the dev server — the same
+      # `pnpm build` (just ran above) + `pnpm start` pairing quickstart.md and a developer both
+      # use locally.
+      - name: Install Playwright browsers
+        if: ${{ !cancelled() }}
+        run: pnpm --filter @pascca/web exec playwright install --with-deps chromium
+
+      - name: Start production server
+        if: ${{ !cancelled() }}
+        run: pnpm --filter @pascca/web start &
+
+      - name: Wait for production server
+        if: ${{ !cancelled() }}
+        run: npx wait-on http://localhost:3000/en --timeout 60000
+
+      - name: Playwright a11y audit
+        if: ${{ !cancelled() }}
+        run: pnpm --filter @pascca/web exec playwright test tests/a11y
+
+      - name: Lighthouse thresholds (SC-006)
+        if: ${{ !cancelled() }}
+        run: node apps/web/scripts/lighthouse-check.mjs
