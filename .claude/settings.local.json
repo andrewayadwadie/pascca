@@ -33,7 +33,21 @@
       "Bash(tasklist //FI \"IMAGENAME eq node.exe\")",
       "Bash(taskkill //F //PID 4920 //T)",
       "Bash(taskkill //F //PID 6092 //T)",
-      "Bash(taskkill //F //PID 18092 //T)"
+      "Bash(taskkill //F //PID 18092 //T)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --draft --title 'Monorepo scaffold: workspace, apps, CI, migration gating' --body ' *)",
+      "Bash(git check-ignore *)",
+      "Bash(git grep *)",
+      "Bash(git add *)",
+      "Bash(gh pr *)",
+      "Bash(git commit -m 'docs: mark T057 complete *)",
+      "Bash(git checkout *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "PowerShell(.specify\\\\extensions\\\\git\\\\scripts\\\\powershell\\\\create-new-feature.ps1 -Json -ShortName \"content-schema-seed\" \"Implement the complete Prisma schema for Pascca and a seed script.\")",
+      "Bash(pwsh -NoProfile -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)",
+      "Bash(powershell -NoProfile -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)"
     ]
   }
 }
