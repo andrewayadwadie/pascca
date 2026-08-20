@@ -10,7 +10,7 @@ Bilingual (Arabic-first) website, admin dashboard, and Phase 8 Flutter app for P
 Italian restaurant with two Cairo branches. No application code yet; the stack below is
 mandated by the constitution, not chosen per feature.
 
-**`.specify/memory/constitution.md` v2.0.0 governs this repo and wins over anything here.**
+**`.specify/memory/constitution.md` v3.0.0 governs this repo and wins over anything here.**
 If the two disagree, this file is the bug. Read the constitution before planning or
 implementing. Do not amend it during an implement run — if an article blocks you, stop and
 report (Article 34).
@@ -37,7 +37,11 @@ Articles marked `[NN]` need client sign-off to change. The ones that get violate
 - **English first, Arabic-ready (Art 21)** — routes `/[locale]/…` with `en` default, `ar`
   disabled by flag; logical CSS properties only. `margin-left` in layout is violation.
 - **Tokens are locked (Art 16)** — no raw hex, no one-off font stacks. Gold (#D4AF37) is the
-  only accent and never body copy. Dark surfaces (#0A0A0A, #141414). Self-hosted fonts only.
+  only accent and never body copy; use `--gold-ink` for gold-family text on light. Base surfaces
+  are light warm (#FBF7F0, #FFFFFF); the v2.0.0 dark set is scoped to `[data-surface="dark"]`
+  for the footer, evening sections and the reservation panel. `--w*` means ink on the *current*
+  surface, not white — solid inverting fills use `--contrast`/`--contrast-ink`. Self-hosted
+  fonts only.
 - **Errors are contracts (Art 10)** — enveloped responses, permanent codes registered in
   `docs/api.md`. Clients switch on `code`, never `message`.
 - **Booking (Art 25)** — seat-overlap availability inside one transaction under
@@ -56,7 +60,7 @@ Fixed by Article 5. Substitutions require a constitution amendment.
   `ar` registered but disabled by flag. next-intl, ISR `revalidate: 60` + dashboard-save webhook.
 - **Dashboard** `apps/admin` — Vite + React 19 SPA, pure API client, English-first RTL.
 - **Shared** `packages/types` (generated from OpenAPI — never hand-written),
-  `packages/config/tokens.css` (Art 16: dark surfaces, gold accent only).
+  `packages/config/tokens.css` (Art 16: light warm base, scoped dark treatment, gold accent only).
 - **Storage/Media** Cloudflare R2 presigned uploads, sharp → WebP/AVIF (3 sizes).
 - **Cache/Locks/Queues** Redis 7, BullMQ.
 - **Auth** JWT access 15m, rotating refresh 30d, reuse detection (Art 29).
@@ -104,6 +108,7 @@ for that area pass · audit log fires where Article 15 requires ·
 
 - `docs/api.md` — error-code registry (Art 10). Create with the first API feature.
 - `.env.example` — must exist and stay current (Art 13 in v1 implied; validate at boot).
-- `packages/config/tokens.css` — the constitution's Article 16 block is normative until this
-  file exists. Dark surfaces + gold accent, self-hosted fonts.
+- ~~`packages/config/tokens.css`~~ — done. Implements Article 16 v3.0.0: light warm base,
+  `[data-surface="dark"]` treatment, gold accent, self-hosted fonts. Contrast for both
+  treatments is enforced in CI by `scripts/check-token-contrast.mjs`.
 - Privacy policy, live before the site goes public (Art 29). State retention period.

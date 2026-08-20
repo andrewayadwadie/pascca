@@ -26,7 +26,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer>
+    <footer data-surface="dark">
       <div className="fc">
         <div className="fbrand">
           <b>{tNav("brandName")}</b>

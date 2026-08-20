@@ -16,7 +16,10 @@
   --color-surface-3: var(--surface-3);
   --color-gold: var(--gold);
   --color-gold-2: var(--gold-2);
+  --color-gold-ink: var(--gold-ink);
   --color-w: var(--w);
+  --color-contrast: var(--contrast);
+  --color-contrast-ink: var(--contrast-ink);
 
   --radius-sm: var(--r-sm);
   --radius-DEFAULT: var(--r);
@@ -269,8 +272,8 @@ h3 {
   transform: translateY(-3px);
 }
 .btn-w {
-  background: var(--w);
-  color: var(--black);
+  background: var(--contrast);
+  color: var(--contrast-ink);
 }
 .btn-w:hover {
   background: var(--gold);
@@ -501,8 +504,8 @@ nav.small {
   text-transform: uppercase;
 }
 .mcta .m {
-  background: var(--w);
-  color: var(--black);
+  background: var(--contrast);
+  color: var(--contrast-ink);
 }
 .mcta .b {
   background: var(--gold);
@@ -621,7 +624,7 @@ nav.small {
   inset: 0;
   border-radius: 50%;
   border: 1px solid var(--gold-28);
-  background: radial-gradient(circle at 30% 24%, var(--w14), transparent 46%);
+  background: radial-gradient(circle at 30% 24%, var(--plate-hi), transparent 46%);
 }
 .plate span {
   position: relative;
@@ -1304,6 +1307,11 @@ nav.small {
 
 /* ---------- footer (SiteFooter) ---------- */
 footer {
+  /* opts into the dark treatment via data-surface="dark" (Article 16). The
+     rebound tokens do not paint anything on their own, so the ground is set
+     here explicitly; every rule below then reads the dark ink scale. */
+  background: var(--bg);
+  color: var(--w);
   border-block-start: 1px solid var(--w06);
   padding: clamp(56px, 7vw, 96px) var(--pad) 26px;
 }

@@ -126,6 +126,14 @@ jobs:
         if: ${{ !cancelled() }}
         run: node scripts/check-hex-literals.mjs apps/web apps/admin
 
+      # constitution v3.0.0 (Art. 16 + Art. 28 [NN]): the light base and the scoped dark
+      # treatment each have their own ink scale, and an alpha that is legible on #0A0A0A is
+      # not legible on #FBF7F0. This recomputes WCAG AA for every ink/surface pair in both
+      # treatments so a token edit cannot quietly drop text below 4.5:1.
+      - name: Check token contrast
+        if: ${{ !cancelled() }}
+        run: node scripts/check-token-contrast.mjs
+
       # `migrate deploy`, not `migrate dev` — applies the committed migration file as-is and
       # never generates a new one (contracts/db-commands.md). Same command migrate.yml uses
       # against production; here it targets only the ephemeral `services.postgres` above.

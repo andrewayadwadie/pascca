@@ -235,27 +235,44 @@ Admin deletes are soft deletes with a 30-day window. Every create/update/delete 
 
 Every colour, font, radius and easing derives from packages/config/tokens.css. No component may introduce a raw hex, a one-off font stack, or an arbitrary radius.
 
+The base surface is **light and warm**. Dark is retained as a named *treatment*, not the default: any section may opt into it with `data-surface="dark"`, which reassigns the same token names to the original dark values. Components therefore never branch on surface — they read the same tokens either way.
+
 ```css
 :root{
-  /* surfaces */
-  --bg:#0A0A0A; --surface:#141414; --surface-2:#1B1B1B; --surface-3:#232323;
+  /* surfaces — light warm base */
+  --bg:#FBF7F0; --surface:#FFFFFF; --surface-2:#F4EDE2; --surface-3:#EAE0D1;
   /* accent — the only accent */
   --gold:#D4AF37; --gold-2:#F4A460; --gold-dim:rgba(212,175,55,.12);
-  /* ink */
-  --w:#FFFFFF; --w70:rgba(255,255,255,.7); --w60:rgba(255,255,255,.6);
-  --w50:rgba(255,255,255,.5); --w40:rgba(255,255,255,.4);
-  --w20:rgba(255,255,255,.2); --w10:rgba(255,255,255,.1); --w06:rgba(255,255,255,.06);
+  --gold-ink:#77621F;   /* gold-family TEXT on light — AA on every light surface. Never body copy. */
+  /* ink — always reads on the current surface */
+  --w:#161210; --w70:rgba(22,18,16,.8); --w60:rgba(22,18,16,.7);
+  --w50:rgba(22,18,16,.62); --w40:rgba(22,18,16,.61);
+  --w20:rgba(22,18,16,.2); --w10:rgba(22,18,16,.1); --w06:rgba(22,18,16,.06);
+  /* contrast — the solid fill that inverts the current surface */
+  --contrast:#161210; --contrast-ink:#FBF7F0;
   /* geometry */
   --r-sm:14px; --r:24px; --r-lg:32px; --pill:999px;
   --pad:clamp(20px,5vw,80px); --maxw:1440px;
   /* motion */
   --spring:cubic-bezier(0.175,0.885,0.32,1.275); --ease:cubic-bezier(.22,1,.36,1);
 }
+
+/* the dark treatment — the v2.0.0 values, preserved, now scoped */
+[data-surface="dark"]{
+  --bg:#0A0A0A; --surface:#141414; --surface-2:#1B1B1B; --surface-3:#232323;
+  --gold-ink:var(--gold);
+  --w:#FFFFFF; --w70:rgba(255,255,255,.7); --w60:rgba(255,255,255,.6);
+  --w50:rgba(255,255,255,.5); --w40:rgba(255,255,255,.55);
+  --w20:rgba(255,255,255,.2); --w10:rgba(255,255,255,.1); --w06:rgba(255,255,255,.06);
+  --contrast:#FFFFFF; --contrast-ink:#000000;
+}
 ```
 
 Type: display Zodiak 400/700 + italics (h1–h4, prices, pull-quotes) · body & UI Plus Jakarta Sans 400–700. Zodiak must be self-hosted as woff2 in apps/web/public/fonts with font-display:swap and a size-adjust fallback — no third-party font CDN in production. Uppercase labels use letter-spacing between .18em and .4em.
 
-Structural rules: gold is the only accent. Cards are --surface with a 1px --w06 border and --r-lg; buttons are pills. No decorative gradients — gradients appear only as photographic overlays or the ambient gold radial glow. One shadow recipe for elevation, one for the floating plate.
+Structural rules: gold is the only accent, and gold is never body copy on any surface — use --gold-ink for gold-family text on light. Cards are --surface with a 1px --w06 border and --r-lg; buttons are pills. Solid inverting buttons and bars use --contrast/--contrast-ink, never --w, so they survive both treatments. No decorative gradients — gradients appear only as photographic overlays or the ambient gold radial glow. One shadow recipe for elevation, one for the floating plate.
+
+Surface discipline: photography-led sections default to light. The dark treatment is reserved for the footer, evening/dinner sections, and the reservation panel — a deliberate change of register, not decoration. A section that opts into dark opts into the dark ink scale with it, automatically, so contrast holds at every boundary.
 
 ### Article 17 — Signature components [NN]
 
@@ -263,7 +280,7 @@ These are part of the brand, not the page:
 
 - 3D floating plate. perspective:1000px container; circular image up to 550px; filter: drop-shadow(0 25px 50px rgba(0,0,0,.5)); 3s float keyframe; on hover translateY(-15px) rotate(2deg) scale(1.05) over 500ms with --spring; behind it a gold radial at 5% opacity with 120px blur.
 - Floating badges anchored to the plate, one rotated −6°, animating on offset delays.
-- Glassmorphism nav — rgba(10,10,10,.95) + 10px backdrop blur, centred wordmark with the gold RISTORANTE sub-label at .4em.
+- Glassmorphism nav — the current surface at .95 alpha (--bg-95, which the dark treatment reassigns) + 10px backdrop blur, centred wordmark with the gold RISTORANTE sub-label at .4em.
 - Mobile floating CTA bar — fixed pill at bottom:24px, --surface glass, two equal buttons: Menu (white) and Book (gold), both uppercase and letterspaced. Shown ≤1100px.
 - Designed image placeholder — correct aspect ratio, a labelled slot, never a broken icon.
 
@@ -286,17 +303,26 @@ Every page carries the same nav, footer, mobile CTA bar and page-hero pattern.
 
 ### Article 19 — Motion budget [NN]
 
-Fixed. Adding one means removing one.
+Budgeted, not frozen. Ten items. Adding an eleventh means removing one.
 
 1. Hero load stagger (~1.1s)
 2. Plate float + hover
 3. Ambient gold glow
-4. Scroll reveal, IntersectionObserver, one-shot, 12% threshold
+4. Scroll reveal, one-shot, 12% threshold
 5. Staggered card entrance
 6. Accordion max-height, one open at a time
-7. Micro: card lift on --spring, image scale on hover, arrow nudge, filter pill transition.
+7. Micro: card lift on --spring, image scale on hover, arrow nudge, filter pill transition
+8. Spring-physics gesture response on dish cards and the gallery lightbox
+9. Scroll-linked reveal on the signature-dish and breakfast sections
+10. Video hero — muted, looped, playsinline, poster-first
 
-@media (prefers-reduced-motion: reduce) disables all of it. Parallax, scroll-jacking, cursor trails and page-transition overlays are prohibited — they hurt LCP on the mobile-first audience.
+A motion library is permitted, for items 8–10 only. It must be tree-shakeable, lazy-loaded below the fold, and absent from the initial route bundle of any page that does not use it.
+
+Video rules, all mandatory: the poster image is the LCP element and the video attaches only after it paints; `muted` + `playsinline` + `loop` + `preload="none"`; ≤ 2.5 MB and ≤ 12 s per clip, H.264 with a WebM sibling; no autoplay when `navigator.connection.saveData` is set; and the still poster is a complete experience on its own. Video never carries information nothing else carries.
+
+@media (prefers-reduced-motion: reduce) disables all ten items and pins every video to its poster frame. Parallax, scroll-jacking, cursor trails and page-transition overlays remain prohibited — they hurt LCP on the mobile-first audience, and nothing in the brief needs them.
+
+Article 28's Lighthouse floor still governs. If the video hero cannot hold mobile performance ≥ 95, the video is cut before the target is.
 
 ### Article 20 — Images [NN]
 
@@ -420,7 +446,11 @@ Compliance is checked at three points: /plan (does the plan respect every articl
 
 ## Changelog
 
+- `3.0.0` — 2026-08-19 — **Design direction inverted.** Light warm base; dark demoted to a scoped `data-surface="dark"` treatment (Art. 16, 17). Motion budget widened 7 → 10 items, permitting a lazy-loaded motion library and a poster-first video hero (Art. 19). Client sign-off recorded 2026-08-19.
+  - *Unchanged:* gold #D4AF37 as the only accent, Zodiak, Plus Jakarta Sans, all geometry and easing values, Art. 18 page order, Art. 20 image pipeline, Art. 28 quality floor. No token name was removed — only rebound.
+  - *Reason:* the brand's own Instagram (26.3K followers, breakfast/brunch-led, bright food photography) is the strongest asset the product has, and a black base fought it while implying a price point the restaurant does not charge (EGP 200–400/person) — straining Art. 2.
+  - *Assessed breakage:* `packages/config/tokens.css` rewritten; the three `--w`-as-background rules in `apps/web/src/styles/globals.css` move to `--contrast`; `ImageSlot` tone gradients were tuned against black and need re-checking on the light base; `specs/004-web-design-system-port` assertions that name dark surfaces are now stale and must be re-read, not silently trusted.
 - `2.0.0` — 2026-08-09 — Design system relocked to the dark/gold Delizoso direction (Art. 16–19). Added: brand positioning and visible pricing (Art. 2), tech track (Art. 5), three-tier content model (Art. 12), manual curation and testimonial consent (Art. 13), English-first/Arabic-ready (Art. 21), delivery surfacing (Art. 23), feature-flagged blog (Art. 24), confirmation policy (Art. 26), email-first notifications (Art. 27).
 - `1.0.0` — 2026-08-08 — Ratified.
 
-**Version**: 2.0.0 | **Ratified**: 2026-08-08 | **Last Amended**: 2026-08-10
+**Version**: 3.0.0 | **Ratified**: 2026-08-08 | **Last Amended**: 2026-08-19

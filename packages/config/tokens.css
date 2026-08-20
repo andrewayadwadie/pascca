@@ -1,12 +1,47 @@
+/* ========================================================================
+   PASCca design tokens — Article 16 [NN], constitution v3.0.0.
+   The ONLY file in the repo permitted to contain a colour, radius, or
+   easing literal. `scripts/check-hex-literals.mjs` fails CI on any other.
+
+   v3.0.0 (2026-08-19, client sign-off) inverted the base surface from dark
+   to light warm. Read this before editing:
+
+   - No token name was removed. Every name from v2.0.0 still exists.
+   - `--w*` means "ink that reads on the CURRENT surface", not "white".
+     It was already used that way everywhere except three background rules,
+     which moved to `--contrast` (see globals.css).
+   - The v2.0.0 dark values are NOT deleted. They live in the
+     `[data-surface="dark"]` block below and are applied by opting a section
+     in — footer, evening/dinner sections, reservation panel (Article 16,
+     "Surface discipline"). Components never branch on surface; they read
+     the same token names and get the right value.
+   ======================================================================== */
+
 :root{
-  /* surfaces */
-  --bg:#0A0A0A; --surface:#141414; --surface-2:#1B1B1B; --surface-3:#232323;
+  /* surfaces — light warm base */
+  --bg:#FBF7F0; --surface:#FFFFFF; --surface-2:#F4EDE2; --surface-3:#EAE0D1;
   /* accent — the only accent */
   --gold:#D4AF37; --gold-2:#F4A460; --gold-dim:rgba(212,175,55,.12);
-  /* ink */
-  --w:#FFFFFF; --w70:rgba(255,255,255,.7); --w60:rgba(255,255,255,.6);
-  --w50:rgba(255,255,255,.5); --w40:rgba(255,255,255,.4);
-  --w20:rgba(255,255,255,.2); --w10:rgba(255,255,255,.1); --w06:rgba(255,255,255,.06);
+  /* gold-family TEXT on light. Solved to clear AA on --surface-3, the darkest
+     light surface: 5.54:1 on --bg, 4.53:1 on --surface-3. Never body copy —
+     links, labels and eyebrows only. The dark treatment rebinds it to --gold. */
+  --gold-ink:#77621F;
+  /* ink — always reads on the current surface.
+     The light alphas are NOT the dark alphas: they were solved against
+     --surface-3 (the darkest light surface) so every one of them clears
+     WCAG AA 4.5:1 as text. --w50 carries real body copy (.lede, dish and
+     menu-row descriptions, FAQ answers, branch addresses) and --w40 carries
+     11px uppercase labels, so both sit at the AA floor and necessarily
+     converge — on a light surface you cannot have four legible alpha steps
+     below full ink. Hierarchy below --w60 is carried by size, weight and
+     letter-spacing, which globals.css already does. The dark treatment keeps
+     its wider scale because white-on-black stays legible far lower. */
+  --w:#161210; --w70:rgba(22,18,16,.8); --w60:rgba(22,18,16,.7);
+  --w50:rgba(22,18,16,.62); --w40:rgba(22,18,16,.61);
+  --w20:rgba(22,18,16,.2); --w10:rgba(22,18,16,.1); --w06:rgba(22,18,16,.06);
+  /* contrast — the solid fill that inverts the current surface.
+     Solid buttons and the mobile CTA bar use this, never --w. */
+  --contrast:#161210; --contrast-ink:#FBF7F0;
   /* geometry */
   --r-sm:14px; --r:24px; --r-lg:32px; --pill:999px;
   --pad:clamp(20px,5vw,80px); --maxw:1440px;
@@ -15,15 +50,43 @@
 }
 
 /* ------------------------------------------------------------------------
-   004-web-design-system-port — decorative literals relocated here, values
-   UNCHANGED, from files/site/assets/style.css. The block above is the
-   original, byte-identical :root (research R1) and stays untouched; these
-   were declared inline throughout the rest of that file (image-placeholder
-   gradients, shadows, translucent overlays). Article 16 [NN] forbids a raw
-   hex/rgba literal anywhere outside this file — that rule reaches these too,
-   it just wasn't caught until component work started. Nothing here is a new
-   design decision or a change to a locked value; it is the same literal,
-   named and centralised so every component can reference it via var().
+   The dark treatment — the v2.0.0 values, now scoped. Apply with
+   data-surface="dark" on a section, the footer, or <html> to restore the
+   v2.0.0 site wholesale.
+
+   ONE value deviates from v2.0.0, deliberately: --w40 was rgba(255,255,255,.4),
+   which gives 3.77:1 on --bg. It carries 11px uppercase labels (.lbl-dim,
+   TestimonialCard's .who span, the section eyebrows), so WCAG small-text AA
+   4.5:1 applies and .4 never met it. This is a pre-existing v2.0.0 defect the
+   v3.0.0 contrast audit surfaced, not a v3.0.0 regression; Article 28 [NN]
+   requires the floor, so it is fixed here rather than carried forward. .55
+   gives 5.13:1 and leaves the label visibly dimmer than --w50 body copy.
+   ------------------------------------------------------------------------ */
+[data-surface="dark"]{
+  --bg:#0A0A0A; --surface:#141414; --surface-2:#1B1B1B; --surface-3:#232323;
+  --gold-ink:var(--gold);
+  --w:#FFFFFF; --w70:rgba(255,255,255,.7); --w60:rgba(255,255,255,.6);
+  --w50:rgba(255,255,255,.5); --w40:rgba(255,255,255,.55);
+  --w20:rgba(255,255,255,.2); --w10:rgba(255,255,255,.1); --w06:rgba(255,255,255,.06);
+  --contrast:#FFFFFF; --contrast-ink:#000000;
+
+  /* glass and elevation, re-bound to the dark originals */
+  --w14:rgba(255,255,255,.14);
+  --bg-82:rgba(10,10,10,.82); --bg-95:rgba(10,10,10,.95);
+  --surface-86:rgba(20,20,20,.86);
+  --shadow-55:rgba(0,0,0,.55); --shadow-60:rgba(0,0,0,.6);
+}
+
+/* ------------------------------------------------------------------------
+   004-web-design-system-port — decorative literals relocated here, from
+   files/site/assets/style.css. Article 16 [NN] forbids a raw hex/rgba
+   literal anywhere outside this file, and that rule reaches these too.
+
+   v3.0.0 re-bound the surface-dependent ones (glass, elevation) to light
+   and restored their dark values in the block above. Everything below this
+   comment is surface-INDEPENDENT: it sits on top of an object that has its
+   own colour (the plate, an avatar, a gold overlay), so it is identical in
+   both treatments and is declared once.
    ------------------------------------------------------------------------ */
 :root{
   /* gold, at the alpha values files/site used inline */
@@ -31,21 +94,33 @@
   --gold-28:rgba(212,175,55,.28); --gold-30:rgba(212,175,55,.3);
   --gold-40:rgba(212,175,55,.4); --gold-45:rgba(212,175,55,.45);
 
-  /* white, one alpha step .06–.7 didn't already cover */
-  --w14:rgba(255,255,255,.14);
+  /* ink at .14 — the one alpha step .06–.7 didn't already cover */
+  --w14:rgba(22,18,16,.14);
 
-  /* --bg / --surface at the alpha values files/site used inline */
-  --bg-82:rgba(10,10,10,.82); --bg-95:rgba(10,10,10,.95);
-  --surface-86:rgba(20,20,20,.86);
+  /* glass: the current --bg / --surface at the alpha values files/site used */
+  --bg-82:rgba(251,247,240,.82); --bg-95:rgba(251,247,240,.95);
+  --surface-86:rgba(255,255,255,.86);
 
-  /* pure-black shadows, and the black text files/site sets on gold/white surfaces */
-  --shadow-50:rgba(0,0,0,.5); --shadow-55:rgba(0,0,0,.55); --shadow-60:rgba(0,0,0,.6);
+  /* Elevation. Warm and soft on light — a black .55/.6 drop reads as dirt on
+     cream. The dark treatment restores the originals above.
+     --shadow-50 is NOT re-bound: Article 17 [NN] pins the floating plate to
+     `drop-shadow(0 25px 50px rgba(0,0,0,.5))` by literal value, and the plate
+     is a dark golden object that casts a real contact shadow on any surface.
+     Softening it needs its own Article 17 amendment. */
+  --shadow-50:rgba(0,0,0,.5);
+  --shadow-55:rgba(74,52,26,.10); --shadow-60:rgba(74,52,26,.16);
+
+  /* black text on gold and on --contrast under the dark treatment */
   --black:#000;
 
-  /* :focus-visible's own corner radius — smaller than --r-sm, a distinct literal in the source */
+  /* :focus-visible's own corner radius — smaller than --r-sm */
   --r-focus:4px;
 
-  /* ImageSlot placeholder tones — one radial-gradient pair per `tone` prop value */
+  /* ImageSlot placeholder tones — one radial-gradient pair per `tone` prop.
+     Deliberately unchanged from v2.0.0: these are stand-ins for photography,
+     they read as rich photographic blocks on cream exactly as they did on
+     black, and the label text sitting on them keeps the contrast it was
+     built with. They disappear entirely once real photography lands. */
   --tone-warm-1:#5A3E1A; --tone-warm-2:#2A1C0A;
   --tone-stone-1:#3A3A32; --tone-stone-2:#171713;
   --tone-gold-1:#6A4E20; --tone-gold-2:#241A0A;
@@ -53,7 +128,10 @@
   --tone-ember-1:#5C2C16; --tone-ember-2:#20100A;
   --tone-cream-1:#4A423A; --tone-cream-2:#1A1714;
 
-  /* FloatingPlate's 4-stop radial gradient and TestimonialCard avatar gradient */
+  /* FloatingPlate's 4-stop radial gradient, its specular highlight, and the
+     TestimonialCard avatar gradient. All sit on their own dark object, so the
+     highlight stays white in both treatments — it is not surface ink. */
   --plate-1:#4A3A18; --plate-2:#8A6A2C; --plate-3:#2A1E0C; --plate-4:#120C05;
+  --plate-hi:rgba(255,255,255,.14);
   --av-1:#4A3B22; --av-2:#8A6B34;
 }
